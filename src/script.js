@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { GUI } from 'dat.gui'
 
 const init = () => {
   const sizes = {
@@ -30,6 +31,10 @@ const init = () => {
 
   // Scene
   const scene = new THREE.Scene()
+
+  //GUI
+  const gui = new GUI()
+  scene.add(gui)
 
   /**
    * Object

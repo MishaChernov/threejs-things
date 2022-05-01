@@ -33,7 +33,6 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        minify: false,
       },
 
       // CSS
@@ -60,5 +59,8 @@ module.exports = {
         },
       },
     ],
+  },
+  optimization: {
+    minimize: false,
   },
 }
