@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My 3D things</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
+  </head>
+  <body>
+    <canvas class="webgl"></canvas>
+    <section id="codeblock" contenteditable="false">
+      <button id="resize-btn">Resize</button>
+      <div
+        style="
+          color: rgb(225, 228, 232);
+          background-color: rgb(36, 41, 46);
+          font-family: Menlo, Monaco, 'Courier New', monospace;
+          font-size: 12px;
+          line-height: 18px;
+          white-space: pre;
+        "
+      >
+        <div>
+          <div
+            style="
+              background-color: rgb(36, 41, 46);
+              font-size: 12px;
+              line-height: 18px;
+            "
+          >
+            <div>
+              <div
+                style="
+                  background-color: rgb(36, 41, 46);
+                  font-size: 12px;
+                  line-height: 18px;
+                "
+              >
+                <div>
+                  <span style="color: #f97583">import</span>
+                  <span style="color: #9ecbff">'./style.css'</span>
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span>
+                  <span style="color: #79b8ff">*</span>
+                  <span style="color: #f97583">as</span> THREE
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff">'three'</span>
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span> { OrbitControls }
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff"
+                    >'three/examples/jsm/controls/OrbitControls.js'</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span> { FontLoader }
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff"
+                    >'three/examples/jsm/loaders/FontLoader.js'</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span> { TextGeometry }
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff"
+                    >'three/examples/jsm/geometries/TextGeometry.js'</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span> gsap
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff">'gsap'</span>
+                </div>
+                <div>
+                  <span style="color: #f97583">import</span>
+                  <span style="color: #79b8ff">*</span>
+                  <span style="color: #f97583">as</span> gui
+                  <span style="color: #f97583">from</span>
+                  <span style="color: #9ecbff">'dat.gui'</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">parameters</span>
+                  <span style="color: #f97583">=</span> {
+                </div>
+                <div>color: <span style="color: #9ecbff">'#ff0000'</span>,</div>
+                <div>
+                  <span style="color: #b392f0">spin</span>: ()
+                  <span style="color: #f97583">=&gt;</span> {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">gsap</span>.<span
+                    style="color: #b392f0"
+                    >to</span
+                  >(sphere.rotation, {
+                </div>
+                <div>duration: <span style="color: #79b8ff">1</span>,</div>
+                <div>
+                  y: sphere.rotation.y <span style="color: #f97583">+</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #79b8ff"
+                    >PI</span
+                  >
+                  <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">2</span>,
+                </div>
+                <div>})</div>
+                <div>},</div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">sizes</span>
+                  <span style="color: #f97583">=</span> {
+                </div>
+                <div>
+                  width: <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerWidth</span
+                  >,
+                </div>
+                <div>
+                  height: <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerHeight</span
+                  >,
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">codeblock</span>
+                  <span style="color: #f97583">=</span> {
+                </div>
+                <div>
+                  shouldBeVisible: <span style="color: #79b8ff">false</span>,
+                </div>
+                <div>isVisible: <span style="color: #79b8ff">false</span>,</div>
+                <div>
+                  mouseDownResize: <span style="color: #79b8ff">false</span>,
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">GUI</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span> gui.<span
+                    style="color: #b392f0"
+                    >GUI</span
+                  >()
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">GUI</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">codeblock</span>,
+                  <span style="color: #9ecbff">'shouldBeVisible'</span>).<span
+                    style="color: #b392f0"
+                    >name</span
+                  >(<span style="color: #9ecbff">'Show codeblock'</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">GUI</span>.<span
+                    style="color: #b392f0"
+                    >addColor</span
+                  >(<span style="color: #79b8ff">parameters</span>,
+                  <span style="color: #9ecbff">'color'</span>).<span
+                    style="color: #b392f0"
+                    >onChange</span
+                  >(() <span style="color: #f97583">=&gt;</span> {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">material</span>.color.<span
+                    style="color: #b392f0"
+                    >set</span
+                  >(<span style="color: #79b8ff">parameters</span>.color)
+                </div>
+                <div>})</div>
+                <div>
+                  <span style="color: #79b8ff">GUI</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">parameters</span>,
+                  <span style="color: #9ecbff">'spin'</span>)
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">textureLoader</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >TextureLoader</span
+                  >()
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">fontLoader</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #b392f0">FontLoader</span>()
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">matcapTexture</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">textureLoader</span>.<span
+                    style="color: #b392f0"
+                    >load</span
+                  >(<span style="color: #9ecbff">'/textures/matcaps/1.png'</span
+                  >)
+                </div>
+                <br />
+                <div><span style="color: #6a737d">/**</span></div>
+                <div><span style="color: #6a737d"> * Base</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <div><span style="color: #6a737d">// Canvas</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">canvas</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >querySelector</span
+                  >(<span style="color: #9ecbff">'canvas.webgl'</span>)
+                </div>
+                <br />
+                <div><span style="color: #6a737d">// Scene</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">scene</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >Scene</span
+                  >()
+                </div>
+                <br />
+                <div><span style="color: #6a737d">/**</span></div>
+                <div><span style="color: #6a737d"> * Object</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <div>
+                  <span style="color: #79b8ff">fontLoader</span>.<span
+                    style="color: #b392f0"
+                    >load</span
+                  >(<span style="color: #9ecbff"
+                    >'/fonts/helvetiker_regular.typeface.json'</span
+                  >, (<span style="color: #ffab70">font</span>)
+                  <span style="color: #f97583">=&gt;</span> {
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">textGeometry</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #b392f0">TextGeometry</span>(<span
+                    style="color: #9ecbff"
+                    >'Mykhailo Chernov'</span
+                  >, {
+                </div>
+                <div>font,</div>
+                <div>size: <span style="color: #79b8ff">0.5</span>,</div>
+                <div>height: <span style="color: #79b8ff">0.2</span>,</div>
+                <div>
+                  curveSegments: <span style="color: #79b8ff">10</span>,
+                </div>
+                <div>
+                  bevelEnabled: <span style="color: #79b8ff">true</span>,
+                </div>
+                <div>
+                  bevelThickness: <span style="color: #79b8ff">0.03</span>,
+                </div>
+                <div>bevelSize: <span style="color: #79b8ff">0.02</span>,</div>
+                <div>bevelOffset: <span style="color: #79b8ff">0</span>,</div>
+                <div>bevelSegments: <span style="color: #79b8ff">3</span>,</div>
+                <div>})</div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">textMaterial</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >MeshMatcapMaterial</span
+                  >({ matcap:
+                  <span style="color: #79b8ff">matcapTexture</span> })
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">text</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >Mesh</span
+                  >(<span style="color: #79b8ff">textGeometry</span>,
+                  <span style="color: #79b8ff">textMaterial</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">textGeometry</span>.<span
+                    style="color: #b392f0"
+                    >center</span
+                  >()
+                </div>
+                <div>
+                  <span style="color: #79b8ff">material</span>.wireframe
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">true</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">scene</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">text</span>)
+                </div>
+                <div>})</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">material</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >MeshStandardMaterial</span
+                  >({ color: <span style="color: #79b8ff">0xff0000</span> })
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">donutGeometry</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >TorusGeometry</span
+                  >(<span style="color: #79b8ff">0.3</span>,
+                  <span style="color: #79b8ff">0.2</span>,
+                  <span style="color: #79b8ff">20</span>,
+                  <span style="color: #79b8ff">45</span>)
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">donutMaterial</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >MeshMatcapMaterial</span
+                  >({ matcap:
+                  <span style="color: #79b8ff">matcapTexture</span> })
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">for</span> (<span
+                    style="color: #f97583"
+                    >let</span
+                  >
+                  i <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">0</span>; i
+                  <span style="color: #f97583">&lt;</span>
+                  <span style="color: #79b8ff">300</span>; i<span
+                    style="color: #f97583"
+                    >++</span
+                  >) {
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">donut</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >Mesh</span
+                  >(<span style="color: #79b8ff">donutGeometry</span>,
+                  <span style="color: #79b8ff">donutMaterial</span>)
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.x <span style="color: #f97583">=</span> (<span
+                    style="color: #79b8ff"
+                    >Math</span
+                  >.<span style="color: #b392f0">random</span>()
+                  <span style="color: #f97583">-</span>
+                  <span style="color: #79b8ff">0.5</span>)
+                  <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">10</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.y <span style="color: #f97583">=</span> (<span
+                    style="color: #79b8ff"
+                    >Math</span
+                  >.<span style="color: #b392f0">random</span>()
+                  <span style="color: #f97583">-</span>
+                  <span style="color: #79b8ff">0.5</span>)
+                  <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">10</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.z <span style="color: #f97583">=</span> (<span
+                    style="color: #79b8ff"
+                    >Math</span
+                  >.<span style="color: #b392f0">random</span>()
+                  <span style="color: #f97583">-</span>
+                  <span style="color: #79b8ff">0.5</span>)
+                  <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">10</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >rotation</span
+                  >.x <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #b392f0"
+                    >random</span
+                  >() <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #79b8ff"
+                    >PI</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >rotation</span
+                  >.y <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #b392f0"
+                    >random</span
+                  >() <span style="color: #f97583">*</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #79b8ff"
+                    >PI</span
+                  >
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">scale</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">Math</span>.<span
+                    style="color: #b392f0"
+                    >random</span
+                  >()
+                </div>
+                <div>
+                  <span style="color: #79b8ff">donut</span>.<span
+                    style="color: #79b8ff"
+                    >scale</span
+                  >.<span style="color: #b392f0">set</span>(<span
+                    style="color: #79b8ff"
+                    >scale</span
+                  >, <span style="color: #79b8ff">scale</span>,
+                  <span style="color: #79b8ff">scale</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">scene</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">donut</span>)
+                </div>
+                <div>}</div>
+                <br />
+                <div><span style="color: #6a737d">// Lights</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">ambientLight</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >AmbientLight</span
+                  >(<span style="color: #79b8ff">0xffffff</span>,
+                  <span style="color: #79b8ff">0.5</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">scene</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">ambientLight</span>)
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">pointLight</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >PointLight</span
+                  >(<span style="color: #79b8ff">0xffffff</span>,
+                  <span style="color: #79b8ff">0.5</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">pointLight</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.x <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">2</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">pointLight</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.y <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">3</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">pointLight</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.z <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">4</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">scene</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">pointLight</span>)
+                </div>
+                <br />
+                <div><span style="color: #6a737d">/**</span></div>
+                <div><span style="color: #6a737d"> * Camera</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <div><span style="color: #6a737d">// Base camera</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">camera</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >PerspectiveCamera</span
+                  >(
+                </div>
+                <div><span style="color: #79b8ff">75</span>,</div>
+                <div>
+                  <span style="color: #79b8ff">sizes</span>.width
+                  <span style="color: #f97583">/</span>
+                  <span style="color: #79b8ff">sizes</span>.height,
+                </div>
+                <div><span style="color: #79b8ff">0.1</span>,</div>
+                <div><span style="color: #79b8ff">100</span></div>
+                <div>)</div>
+                <div>
+                  <span style="color: #79b8ff">camera</span>.<span
+                    style="color: #79b8ff"
+                    >position</span
+                  >.z <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">3</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">scene</span>.<span
+                    style="color: #b392f0"
+                    >add</span
+                  >(<span style="color: #79b8ff">camera</span>)
+                </div>
+                <br />
+                <div><span style="color: #6a737d">// Controls</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">controls</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #b392f0">OrbitControls</span>(<span
+                    style="color: #79b8ff"
+                    >camera</span
+                  >, <span style="color: #79b8ff">canvas</span>)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">controls</span>.enableDamping
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">true</span>
+                </div>
+                <br />
+                <div><span style="color: #6a737d">/**</span></div>
+                <div><span style="color: #6a737d"> * Renderer</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">renderer</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >WebGLRenderer</span
+                  >({
+                </div>
+                <div>canvas: <span style="color: #79b8ff">canvas</span>,</div>
+                <div>})</div>
+                <div>
+                  <span style="color: #79b8ff">renderer</span>.<span
+                    style="color: #b392f0"
+                    >setSize</span
+                  >(<span style="color: #79b8ff">sizes</span>.width,
+                  <span style="color: #79b8ff">sizes</span>.height)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">renderer</span>.<span
+                    style="color: #b392f0"
+                    >setPixelRatio</span
+                  >(<span style="color: #79b8ff">Math</span>.<span
+                    style="color: #b392f0"
+                    >min</span
+                  >(<span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >devicePixelRatio</span
+                  >, <span style="color: #79b8ff">2</span>))
+                </div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #b392f0"
+                    >addEventListener</span
+                  >(<span style="color: #9ecbff">'resize'</span>, ()
+                  <span style="color: #f97583">=&gt;</span>
+                  <span style="color: #b392f0">updateSizes</span>)
+                </div>
+                <br />
+                <div><span style="color: #6a737d">/**</span></div>
+                <div><span style="color: #6a737d"> * Animate</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">clock</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">new</span>
+                  <span style="color: #79b8ff">THREE</span>.<span
+                    style="color: #b392f0"
+                    >Clock</span
+                  >()
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #b392f0">tick</span>
+                  <span style="color: #f97583">=</span> ()
+                  <span style="color: #f97583">=&gt;</span> {
+                </div>
+                <div>
+                  <span style="color: #6a737d"
+                    >// const elapsedTime = clock.getElapsedTime()</span
+                  >
+                </div>
+                <br />
+                <div>
+                  <span style="color: #6a737d">// Update controls</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">controls</span>.<span
+                    style="color: #b392f0"
+                    >update</span
+                  >()
+                </div>
+                <br />
+                <div><span style="color: #6a737d">// Render</span></div>
+                <div>
+                  <span style="color: #79b8ff">renderer</span>.<span
+                    style="color: #b392f0"
+                    >render</span
+                  >(<span style="color: #79b8ff">scene</span>,
+                  <span style="color: #79b8ff">camera</span>)
+                </div>
+                <br />
+                <div>
+                  <span style="color: #6a737d"
+                    >// Appear/disapear codeblock on the page</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #79b8ff"
+                    >codeblock</span
+                  >.shouldBeVisible <span style="color: #f97583">!=</span>
+                  <span style="color: #79b8ff">codeblock</span>.isVisible) {
+                </div>
+                <div><span style="color: #b392f0">toogleCodeblock</span>()</div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #6a737d"
+                    >// Call tick again on the next frame</span
+                  >
+                </div>
+                <div>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #b392f0"
+                    >requestAnimationFrame</span
+                  >(<span style="color: #b392f0">tick</span>)
+                </div>
+                <div>}</div>
+                <br />
+                <div><span style="color: #b392f0">tick</span>()</div>
+                <br />
+                <div><span style="color: #6a737d">/*</span></div>
+                <div><span style="color: #6a737d"> * Helpers</span></div>
+                <div><span style="color: #6a737d"> */</span></div>
+                <br />
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">resizeButton</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >getElementById</span
+                  >(<span style="color: #9ecbff">'resize-btn'</span>)
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">codeblockElement</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >getElementById</span
+                  >(<span style="color: #9ecbff">'codeblock'</span>)
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">codeblockScreenPosition</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #b392f0"
+                    >getBoundingClientRect</span
+                  >()
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">function</span>
+                  <span style="color: #b392f0">updateSizes</span>(<span
+                    style="color: #ffab70"
+                    >width</span
+                  >
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerWidth</span
+                  >, <span style="color: #ffab70">height</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerHeight</span
+                  >) {
+                </div>
+                <div><span style="color: #6a737d">// Update sizes</span></div>
+                <div>
+                  <span style="color: #79b8ff">sizes</span>.width
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #ffab70">width</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">sizes</span>.height
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #ffab70">height</span>
+                </div>
+                <br />
+                <div><span style="color: #6a737d">// Update camera</span></div>
+                <div>
+                  <span style="color: #79b8ff">camera</span>.aspect
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">sizes</span>.width
+                  <span style="color: #f97583">/</span>
+                  <span style="color: #79b8ff">sizes</span>.height
+                </div>
+                <div>
+                  <span style="color: #79b8ff">camera</span>.<span
+                    style="color: #b392f0"
+                    >updateProjectionMatrix</span
+                  >()
+                </div>
+                <br />
+                <div>
+                  <span style="color: #6a737d">// Update renderer</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">renderer</span>.<span
+                    style="color: #b392f0"
+                    >setSize</span
+                  >(<span style="color: #79b8ff">sizes</span>.width,
+                  <span style="color: #79b8ff">sizes</span>.height)
+                </div>
+                <div>
+                  <span style="color: #79b8ff">renderer</span>.<span
+                    style="color: #b392f0"
+                    >setPixelRatio</span
+                  >(<span style="color: #79b8ff">Math</span>.<span
+                    style="color: #b392f0"
+                    >min</span
+                  >(<span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >devicePixelRatio</span
+                  >, <span style="color: #79b8ff">2</span>))
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">function</span>
+                  <span style="color: #b392f0">toogleCodeblock</span>() {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.isVisible
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">!</span
+                  ><span style="color: #79b8ff">codeblock</span>.isVisible
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #79b8ff"
+                    >codeblock</span
+                  >.isVisible) {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #79b8ff"
+                    >style</span
+                  >.<span style="color: #79b8ff">marginLeft</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #9ecbff">'50%'</span>
+                </div>
+                <div>
+                  <span style="color: #b392f0">updateSizes</span>(<span
+                    style="color: #79b8ff"
+                    >window</span
+                  >.<span style="color: #79b8ff">innerWidth</span>
+                  <span style="color: #f97583">/</span>
+                  <span style="color: #79b8ff">2</span>,
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerHeight</span
+                  >)
+                </div>
+                <div><span style="color: #b392f0">stickGuiLeft</span>()</div>
+                <div>} <span style="color: #f97583">else</span> {</div>
+                <div>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #79b8ff"
+                    >style</span
+                  >.<span style="color: #79b8ff">marginLeft</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #9ecbff">'100%'</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #79b8ff"
+                    >style</span
+                  >.<span style="color: #79b8ff">width</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #9ecbff">'50vw'</span>
+                </div>
+                <div><span style="color: #b392f0">updateSizes</span>()</div>
+                <div><span style="color: #b392f0">stickGuiRight</span>()</div>
+                <div>}</div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">function</span>
+                  <span style="color: #b392f0">stickGuiLeft</span>() {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >getElementsByClassName</span
+                  >(<span style="color: #9ecbff">'dg main a'</span>)[<span
+                    style="color: #79b8ff"
+                    >0</span
+                  >].style.float <span style="color: #f97583">=</span>
+                  <span style="color: #9ecbff">'left'</span>
+                </div>
+                <div>}</div>
+                <div>;<span style="color: #9ecbff">``</span></div>
+                <div>
+                  <span style="color: #f97583">function</span>
+                  <span style="color: #b392f0">stickGuiRight</span>() {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >getElementsByClassName</span
+                  >(<span style="color: #9ecbff">'dg main a'</span>)[<span
+                    style="color: #79b8ff"
+                    >0</span
+                  >].style.float <span style="color: #f97583">=</span>
+                  <span style="color: #9ecbff">'right'</span>
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">function</span>
+                  <span style="color: #b392f0">handleMouseMove</span>(<span
+                    style="color: #ffab70"
+                    >e</span
+                  >) {
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span>
+                  <span style="color: #79b8ff">availableZone</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #ffab70">e</span>.clientX
+                  <span style="color: #f97583">&lt;</span>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerWidth</span
+                  >
+                  <span style="color: #f97583">-</span>
+                  <span style="color: #79b8ff">35</span>
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span> {
+                  <span style="color: #79b8ff">shouldBeVisible</span>,
+                  <span style="color: #79b8ff">mouseDownResize</span>,
+                  <span style="color: #79b8ff">isVisible</span> }
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">codeblock</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #f97583"
+                    >!</span
+                  ><span style="color: #79b8ff">availableZone</span>
+                  <span style="color: #f97583">&amp;&amp;</span>
+                  <span style="color: #79b8ff">shouldBeVisible</span>
+                  <span style="color: #f97583">&amp;&amp;</span>
+                  <span style="color: #79b8ff">mouseDownResize</span>) {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.shouldBeVisible
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">!</span
+                  ><span style="color: #79b8ff">shouldBeVisible</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.mouseDownResize
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">false</span>
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #79b8ff"
+                    >isVisible</span
+                  >
+                  <span style="color: #f97583">&amp;&amp;</span>
+                  <span style="color: #79b8ff">availableZone</span>
+                  <span style="color: #f97583">&amp;&amp;</span>
+                  <span style="color: #79b8ff">shouldBeVisible</span>
+                  <span style="color: #f97583">&amp;&amp;</span>
+                  <span style="color: #79b8ff">mouseDownResize</span>) {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #79b8ff"
+                    >style</span
+                  >.<span style="color: #79b8ff">marginLeft</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #ffab70">e</span>.clientX
+                  <span style="color: #f97583">+</span>
+                  <span style="color: #9ecbff">'px'</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #ffab70"
+                    >e</span
+                  >.clientX <span style="color: #f97583">&lt;</span>
+                  <span style="color: #79b8ff">codeblockScreenPosition</span
+                  >.<span style="color: #79b8ff">x</span>) {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblockElement</span>.<span
+                    style="color: #79b8ff"
+                    >style</span
+                  >.<span style="color: #79b8ff">width</span>
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerWidth</span
+                  >
+                  <span style="color: #f97583">-</span>
+                  <span style="color: #ffab70">e</span>.clientX
+                  <span style="color: #f97583">+</span>
+                  <span style="color: #9ecbff">'px'</span>
+                </div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #b392f0">updateSizes</span>(<span
+                    style="color: #ffab70"
+                    >e</span
+                  >.clientX, <span style="color: #79b8ff">window</span>.<span
+                    style="color: #79b8ff"
+                    >innerHeight</span
+                  >)
+                </div>
+                <div>}</div>
+                <div>}</div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">resizeButton</span>.<span
+                    style="color: #b392f0"
+                    >addEventListener</span
+                  >(<span style="color: #9ecbff">'mousedown'</span>,
+                  <span style="color: #f97583">function</span> () {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.mouseDownResize
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">true</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >addEventListener</span
+                  >(<span style="color: #9ecbff">'mousemove'</span>,
+                  <span style="color: #b392f0">handleMouseMove</span>)
+                </div>
+                <div>})</div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">resizeButton</span>.<span
+                    style="color: #b392f0"
+                    >addEventListener</span
+                  >(<span style="color: #9ecbff">'mouseup'</span>,
+                  <span style="color: #f97583">function</span> () {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.mouseDownResize
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">false</span>
+                </div>
+                <div>})</div>
+                <br />
+                <div>
+                  <span style="color: #79b8ff">document</span>.<span
+                    style="color: #b392f0"
+                    >addEventListener</span
+                  >(<span style="color: #9ecbff">'keypress'</span>, (<span
+                    style="color: #ffab70"
+                    >e</span
+                  >) <span style="color: #f97583">=&gt;</span> {
+                </div>
+                <div>
+                  <span style="color: #f97583">const</span> {
+                  <span style="color: #79b8ff">shouldBeVisible</span> }
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #79b8ff">codeblock</span>
+                </div>
+                <br />
+                <div>
+                  <span style="color: #f97583">if</span> (<span
+                    style="color: #ffab70"
+                    >e</span
+                  >.<span style="color: #79b8ff">code</span>
+                  <span style="color: #f97583">===</span>
+                  <span style="color: #9ecbff">'KeyG'</span>) {
+                </div>
+                <div>
+                  <span style="color: #79b8ff">codeblock</span>.shouldBeVisible
+                  <span style="color: #f97583">=</span>
+                  <span style="color: #f97583">!</span
+                  ><span style="color: #79b8ff">shouldBeVisible</span>
+                </div>
+                <div>
+                  <span style="color: #79b8ff">console</span>.<span
+                    style="color: #b392f0"
+                    >log</span
+                  >(<span style="color: #9ecbff">'Toggle code block'</span>)
+                </div>
+                <div>}</div>
+                <div>})</div>
+                <br />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

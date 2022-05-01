@@ -1,0 +1,70 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  /* overflow: hidden; */
+}
+
+body {
+  display: flex;
+  flex-direction: row;
+  overflow-y: scroll;
+}
+
+.webgl {
+  outline: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+#resize-btn {
+  position: absolute;
+  top: 0;
+  left: -15px;
+  font-size: 0;
+  width: 30px;
+  height: 100vh;
+  outline: none;
+  border: none;
+  cursor: ew-resize;
+  background: none;
+  transition: background-size 300ms ease-in-out;
+}
+
+#resize-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  background-image: url('https://www.svgrepo.com/show/17986/horizontal-resize.svg');
+  background-repeat: no-repeat;
+  background-size: 30px;
+  background-position: center center;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+}
+#resize-btn:hover {
+  background-size: 0;
+}
+
+#codeblock {
+  position: relative;
+  margin-left: 100%;
+  overflow: hidden;
+  box-shadow: -5px 0 30px rgba(255, 255, 255, 0.5);
+  width: 50vw;
+}
+
+#codeblock > div > div {
+  padding-left: 35px;
+}
+
+#debugger {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
