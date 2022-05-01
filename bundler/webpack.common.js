@@ -17,7 +17,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../src/index.html'),
-      minify: true,
+      minify: false,
     }),
     new MiniCSSExtractPlugin(),
   ],
@@ -33,6 +33,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
+        minify: false,
       },
 
       // CSS

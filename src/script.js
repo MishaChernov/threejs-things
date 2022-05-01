@@ -23,7 +23,7 @@ const init = () => {
   const textureLoader = new THREE.TextureLoader()
   const fontLoader = new FontLoader()
 
-  const matcapTexture = textureLoader.load('textures/matcaps/1.png')
+  const matcapTexture = textureLoader.load('./textures/matcaps/1.png')
 
   // Canvas
   const canvas = document.querySelector('canvas.webgl')
@@ -34,7 +34,7 @@ const init = () => {
   /**
    * Object
    */
-  fontLoader.load('fonts/helvetiker_regular.typeface.json', (font) => {
+  fontLoader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new TextGeometry('Mykhailo Chernov', {
       font,
       size: 0.5,
