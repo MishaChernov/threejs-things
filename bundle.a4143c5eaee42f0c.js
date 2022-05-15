@@ -51024,256 +51024,6 @@ class MapControls extends (/* unused pure expression or super */ null && (OrbitC
 
 
 
-;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/loaders/FontLoader.js
-
-
-class FontLoader_FontLoader extends Loader {
-
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		const scope = this;
-
-		const loader = new FileLoader( this.manager );
-		loader.setPath( this.path );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
-
-			let json;
-
-			try {
-
-				json = JSON.parse( text );
-
-			} catch ( e ) {
-
-				console.warn( 'THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.' );
-				json = JSON.parse( text.substring( 65, text.length - 2 ) );
-
-			}
-
-			const font = scope.parse( json );
-
-			if ( onLoad ) onLoad( font );
-
-		}, onProgress, onError );
-
-	}
-
-	parse( json ) {
-
-		return new FontLoader_Font( json );
-
-	}
-
-}
-
-//
-
-class FontLoader_Font {
-
-	constructor( data ) {
-
-		this.type = 'Font';
-
-		this.data = data;
-
-	}
-
-	generateShapes( text, size = 100 ) {
-
-		const shapes = [];
-		const paths = createPaths( text, size, this.data );
-
-		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
-
-			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
-
-		}
-
-		return shapes;
-
-	}
-
-}
-
-function createPaths( text, size, data ) {
-
-	const chars = Array.from( text );
-	const scale = size / data.resolution;
-	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
-
-	const paths = [];
-
-	let offsetX = 0, offsetY = 0;
-
-	for ( let i = 0; i < chars.length; i ++ ) {
-
-		const char = chars[ i ];
-
-		if ( char === '\n' ) {
-
-			offsetX = 0;
-			offsetY -= line_height;
-
-		} else {
-
-			const ret = createPath( char, scale, offsetX, offsetY, data );
-			offsetX += ret.offsetX;
-			paths.push( ret.path );
-
-		}
-
-	}
-
-	return paths;
-
-}
-
-function createPath( char, scale, offsetX, offsetY, data ) {
-
-	const glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
-
-	if ( ! glyph ) {
-
-		console.error( 'THREE.Font: character "' + char + '" does not exists in font family ' + data.familyName + '.' );
-
-		return;
-
-	}
-
-	const path = new ShapePath();
-
-	let x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
-
-	if ( glyph.o ) {
-
-		const outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
-
-		for ( let i = 0, l = outline.length; i < l; ) {
-
-			const action = outline[ i ++ ];
-
-			switch ( action ) {
-
-				case 'm': // moveTo
-
-					x = outline[ i ++ ] * scale + offsetX;
-					y = outline[ i ++ ] * scale + offsetY;
-
-					path.moveTo( x, y );
-
-					break;
-
-				case 'l': // lineTo
-
-					x = outline[ i ++ ] * scale + offsetX;
-					y = outline[ i ++ ] * scale + offsetY;
-
-					path.lineTo( x, y );
-
-					break;
-
-				case 'q': // quadraticCurveTo
-
-					cpx = outline[ i ++ ] * scale + offsetX;
-					cpy = outline[ i ++ ] * scale + offsetY;
-					cpx1 = outline[ i ++ ] * scale + offsetX;
-					cpy1 = outline[ i ++ ] * scale + offsetY;
-
-					path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
-
-					break;
-
-				case 'b': // bezierCurveTo
-
-					cpx = outline[ i ++ ] * scale + offsetX;
-					cpy = outline[ i ++ ] * scale + offsetY;
-					cpx1 = outline[ i ++ ] * scale + offsetX;
-					cpy1 = outline[ i ++ ] * scale + offsetY;
-					cpx2 = outline[ i ++ ] * scale + offsetX;
-					cpy2 = outline[ i ++ ] * scale + offsetY;
-
-					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
-
-					break;
-
-			}
-
-		}
-
-	}
-
-	return { offsetX: glyph.ha * scale, path: path };
-
-}
-
-FontLoader_Font.prototype.isFont = true;
-
-
-
-;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/geometries/TextGeometry.js
-/**
- * Text = 3D Text
- *
- * parameters = {
- *  font: <THREE.Font>, // font
- *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
- *  curveSegments: <int>, // number of points on the curves
- *
- *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline (including bevelOffset) is bevel
- *  bevelOffset: <float> // how far from text outline does bevel start
- * }
- */
-
-
-
-class TextGeometry_TextGeometry extends ExtrudeGeometry {
-
-	constructor( text, parameters = {} ) {
-
-		const font = parameters.font;
-
-		if ( ! ( font && font.isFont ) ) {
-
-			console.error( 'THREE.TextGeometry: font parameter is not an instance of THREE.Font.' );
-			return new BufferGeometry();
-
-		}
-
-		const shapes = font.generateShapes( text, parameters.size );
-
-		// translate parameters to ExtrudeGeometry API
-
-		parameters.depth = parameters.height !== undefined ? parameters.height : 50;
-
-		// defaults
-
-		if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
-		if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
-		if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-
-		super( shapes, parameters );
-
-		this.type = 'TextGeometry';
-
-	}
-
-}
-
-
-
-
 ;// CONCATENATED MODULE: ./node_modules/dat.gui/build/dat.gui.module.js
 /**
  * dat-gui JavaScript Controller Library
@@ -53800,123 +53550,223 @@ var index = {
 /* harmony default export */ const dat_gui_module = ((/* unused pure expression or super */ null && (index)));
 //# sourceMappingURL=dat.gui.module.js.map
 
-;// CONCATENATED MODULE: ./src/script.js
-
-
+;// CONCATENATED MODULE: ./src/galaxy.js
 
 
 
 
 
 const init = () => {
+  /* 
+  Constants
+*/
+
   const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
   }
 
-  const codeblock = {
-    shouldBeVisible: false,
-    isVisible: false,
-    mouseDownResize: false,
+  const parameters = {
+    count: 7800,
+    size: 0.001,
+    radius: 4.18,
+    branches: 6,
+    spin: 1.3,
+    randomness: 0.698,
+    randomnessPower: 4.3,
+    insideColor: '#ff6030',
+    outsideColor: '#1b3984',
   }
 
-  /**
-   * Base
-   */
-  //Loaders
-  const textureLoader = new TextureLoader()
-  const fontLoader = new FontLoader_FontLoader()
-
-  const matcapTexture = textureLoader.load('./textures/matcaps/1.png')
-
-  // Canvas
   const canvas = document.querySelector('canvas.webgl')
 
-  // Scene
+  /* 
+  GUI
+*/
+  const gui = new GUI$1({ width: 300 })
+
+  /* 
+  Scene
+*/
   const scene = new Scene()
 
-  //GUI
-  const gui = new GUI$1()
-  scene.add(gui)
+  /*
+  Texture loader
+ */
+  const textureLoader = new TextureLoader()
 
   /**
-   * Object
+   * Galaxy
    */
-  fontLoader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new TextGeometry_TextGeometry('Mykhailo Chernov', {
-      font,
-      size: 0.5,
-      height: 0.2,
-      curveSegments: 10,
-      bevelEnabled: true,
-      bevelThickness: 0.03,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 3,
+  let geometry = null
+  let material = null
+  let points = null
+
+  const generateGalaxy = () => {
+    // Destroy old galaxy
+    if (points !== null) {
+      geometry.dispose()
+      material.dispose()
+      scene.remove(points)
+    }
+
+    /**
+     * Geometry
+     */
+    geometry = new BufferGeometry()
+
+    const positions = new Float32Array(parameters.count * 3)
+    const colors = new Float32Array(parameters.count * 3)
+
+    const colorInside = new Color(parameters.insideColor)
+    const colorOutside = new Color(parameters.outsideColor)
+
+    for (let i = 0; i < parameters.count; i++) {
+      const i3 = i * 3
+
+      const radius = Math.random() * parameters.radius
+      const spinAngle = radius * parameters.spin
+      const branchAngle =
+        ((i % parameters.branches) / parameters.branches) * Math.PI * 2
+
+      const randomX =
+        Math.pow(Math.random(), parameters.randomnessPower) *
+        (Math.random() < 0.5 ? 1 : -1) *
+        parameters.randomness *
+        radius
+      const randomY =
+        Math.pow(Math.random(), parameters.randomnessPower) *
+        (Math.random() < 0.5 ? 1 : -1) *
+        parameters.randomness *
+        radius
+      const randomZ =
+        Math.pow(Math.random(), parameters.randomnessPower) *
+        (Math.random() < 0.5 ? 1 : -1) *
+        parameters.randomness *
+        radius
+
+      positions[i3 + 0] = Math.cos(branchAngle + spinAngle) * radius + randomX
+      positions[i3 + 1] = randomY
+      positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
+
+      const mixedColor = colorInside.clone()
+      mixedColor.lerp(colorOutside, radius / parameters.radius)
+
+      colors[i3] = mixedColor.r
+      colors[i3 + 1] = mixedColor.g
+      colors[i3 + 2] = mixedColor.b
+    }
+
+    geometry.setAttribute('position', new BufferAttribute(positions, 3))
+    geometry.setAttribute('color', new BufferAttribute(colors, 3))
+
+    /**
+     * Material
+     */
+    material = new PointsMaterial({
+      size: parameters.size,
+      sizeAttenuation: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+      vertexColors: true,
     })
-    const textMaterial = new MeshMatcapMaterial({ matcap: matcapTexture })
-    const text = new Mesh(textGeometry, textMaterial)
-    textGeometry.center()
-    material.wireframe = true
 
-    scene.add(text)
-  })
-
-  const material = new MeshStandardMaterial({ color: 0xff0000 })
-  const donutGeometry = new TorusGeometry(0.3, 0.2, 20, 45)
-  const donutMaterial = new MeshMatcapMaterial({ matcap: matcapTexture })
-
-  for (let i = 0; i < 300; i++) {
-    const donut = new Mesh(donutGeometry, donutMaterial)
-
-    donut.position.x = (Math.random() - 0.5) * 10
-    donut.position.y = (Math.random() - 0.5) * 10
-    donut.position.z = (Math.random() - 0.5) * 10
-
-    donut.rotation.x = Math.random() * Math.PI
-    donut.rotation.y = Math.random() * Math.PI
-
-    const scale = Math.random()
-    donut.scale.set(scale, scale, scale)
-    scene.add(donut)
+    /**
+     * Points
+     */
+    points = new Points(geometry, material)
+    scene.add(points)
   }
-
-  // Lights
-  const ambientLight = new AmbientLight(0xffffff, 0.5)
-  scene.add(ambientLight)
-
-  const pointLight = new PointLight(0xffffff, 0.5)
-  pointLight.position.x = 2
-  pointLight.position.y = 3
-  pointLight.position.z = 4
-
-  scene.add(pointLight)
+  generateGalaxy()
 
   /**
-   * Camera
+   * Tweaks gui
    */
-  // Base camera
+
+  gui
+    .add(parameters, 'count')
+    .min(100)
+    .max(100000)
+    .step(100)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'size')
+    .min(0.001)
+    .max(0.1)
+    .step(0.001)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'radius')
+    .min(0.01)
+    .max(20)
+    .step(0.01)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'branches')
+    .min(2)
+    .max(20)
+    .step(1)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'spin')
+    .min(1)
+    .max(5)
+    .step(0.001)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'randomness')
+    .min(0)
+    .max(2)
+    .step(0.001)
+    .onFinishChange(generateGalaxy)
+
+  gui
+    .add(parameters, 'randomnessPower')
+    .min(1)
+    .max(10)
+    .step(0.001)
+    .onFinishChange(generateGalaxy)
+
+  gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy)
+
+  gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy)
+
+  /* 
+  Camera
+*/
   const camera = new PerspectiveCamera(
     75,
     sizes.width / sizes.height,
     0.1,
     100
   )
-  camera.position.z = 3
+  camera.position.z = 6
+  camera.position.y = 3
   scene.add(camera)
 
-  // Controls
+  /* 
+  Controllers
+*/
   const controls = new OrbitControls(camera, canvas)
   controls.enableDamping = true
 
-  /**
-   * Renderer
-   */
-  const renderer = new WebGLRenderer({
-    canvas: canvas,
-  })
+  /* 
+  Renderer
+*/
+  const renderer = new WebGLRenderer({ canvas })
   renderer.setSize(sizes.width, sizes.height)
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio), 2)
+  renderer.setClearColor(0x000000)
+  renderer.render(scene, camera)
+
+  /* 
+  Request Animation Frame
+*/
 
   window.addEventListener('resize', () => updateSizes)
 
@@ -54058,4 +53908,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.62846b7e3c86b602.js.map
+//# sourceMappingURL=bundle.a4143c5eaee42f0c.js.map
