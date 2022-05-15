@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My 3D things</title>
+    <title>My 3D</title>
     <link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico" />
     <link
       rel="stylesheet"
@@ -12,17 +12,41 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
   </head>
   <body>
-    <script>
-      hljs.highlightAll()
-    </script>
-
-    <canvas class="webgl"></canvas>
-    <section id="codeblock" contenteditable="false">
-      <button id="resize-btn">Resize</button>
-
-      <pre><code class="code language-js">    
-        
-      </code></pre>
-    </section>
+    <main class="main-page">
+      <nav class="nav">
+        <a href="./lights.html" class="nav__item nav__item--available">
+          <div class="nav__item-wrapper">
+            <h2>Lights</h2>
+          </div>
+          <img class="nav__img" src="/static/navigation/lights.png" alt="" />
+        </a>
+        <a href="./text.html" class="nav__item nav__item--available">
+          <div class="nav__item-wrapper">
+            <h2>Text</h2>
+          </div>
+          <img class="nav__img" src="/static/navigation/text.png" alt="" />
+        </a>
+        <a href="./house.html" class="nav__item nav__item--available">
+          <div class="nav__item-wrapper">
+            <h2>Ghosts house</h2>
+            <p>Textures, lights</p>
+          </div>
+          <img class="nav__img" src="/static/navigation/house.png" alt="" />
+        </a>
+        <a href="./galaxy.html" class="nav__item nav__item--available">
+          <div class="nav__item-wrapper">
+            <h2>Galaxy</h2>
+            <p>Particles</p>
+          </div>
+          <img class="nav__img" src="/static/navigation/galaxy.png" alt="" />
+        </a>
+        <div class="nav__item">
+          <div class="nav__item-wrapper">
+            <h2></h2>
+          </div>
+          <!-- <img src="/static/navigation/lights.png" alt="" /> -->
+        </div>
+      </nav>
+    </main>
   </body>
 </html>

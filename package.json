@@ -27,6 +27,7 @@
     "ip": "^1.1.5",
     "jsdom": "^19.0.0",
     "jslint": "^0.12.1",
+    "lil-gui": "^0.16.1",
     "mini-css-extract-plugin": "^2.4.3",
     "node-telegram-bot-api": "^0.57.0",
     "portfinder-sync": "0.0.2",
