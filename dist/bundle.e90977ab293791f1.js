@@ -57814,7 +57814,7 @@ const init = () => {
    * Texture Loader
    */
   const textureLoader = new TextureLoader()
-  const gradientMap = textureLoader.load('/textures/gradients/3.jpg')
+  const gradientMap = textureLoader.load('textures/gradients/3.jpg')
   gradientMap.magFilter = NearestFilter
 
   /**
@@ -58101,4 +58101,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.64a9da89a6526f71.js.map
+//# sourceMappingURL=bundle.e90977ab293791f1.js.map

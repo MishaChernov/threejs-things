@@ -34,7 +34,7 @@ const init = () => {
    * Texture Loader
    */
   const textureLoader = new THREE.TextureLoader()
-  const gradientMap = textureLoader.load('/textures/gradients/3.jpg')
+  const gradientMap = textureLoader.load('textures/gradients/3.jpg')
   gradientMap.magFilter = THREE.NearestFilter
 
   /**
