@@ -10,16 +10,20 @@ html {
   padding: 0;
 }
 
-body:not(.home-page) {
+body:not(.no-overflow) {
   overflow: hidden;
 }
 
 body {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   color: #5a626f;
   background-color: #e7fff4;
   font-family: 'Open Sans Condensed', sans-serif;
+}
+
+.dg.ac {
+  z-index: 1 !important;
 }
 
 .webgl {
@@ -135,7 +139,7 @@ body {
 }
 
 .home-link {
-  z-index: 1;
+  z-index: 2;
   position: absolute;
   top: -65px;
   left: -65px;
@@ -276,4 +280,29 @@ body {
   .nav__item:nth-child(6n-5) {
     grid-column-start: 2;
   }
+}
+
+.fake-portfolio {
+  position: relative;
+  z-index: 1;
+}
+
+.fake-portfolio section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  font-size: 3rem;
+  padding: 50px;
+  box-sizing: border-box;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 10px;
+}
+
+.fake-portfolio section:nth-child(2n) {
+  justify-content: flex-end;
+}
+
+.portfolio-page {
+  background-color: #1e1a20;
 }

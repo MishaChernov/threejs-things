@@ -3,7 +3,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
-let htmlPageNames = ['lights', 'text', 'galaxy', 'house', 'raycaster']
+let htmlPageNames = [
+  'lights',
+  'text',
+  'galaxy',
+  'house',
+  'raycaster',
+  'portfolio',
+]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
     template: path.resolve(__dirname, `../src/${name}.html`), // relative path to the HTML files
@@ -21,6 +28,7 @@ module.exports = {
     galaxy: path.resolve(__dirname, '../src/galaxy.js'),
     house: path.resolve(__dirname, '../src/house.js'),
     raycaster: path.resolve(__dirname, '../src/raycaster.js'),
+    portfolio: path.resolve(__dirname, '../src/portfolio.js'),
     //... repeat until example 4
   },
   output: {
