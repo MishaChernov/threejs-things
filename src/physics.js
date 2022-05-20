@@ -115,7 +115,6 @@ const init = () => {
     const volume = normilizeNumber(impactVelocity + event.target.mass, 0, 35)
 
     if (impactVelocity > 1) {
-      console.log(volume)
       hitSound.volume = volume
       hitSound.currentTime = 0
       hitSound.play()
