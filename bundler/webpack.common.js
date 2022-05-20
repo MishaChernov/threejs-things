@@ -3,6 +3,26 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
+// const fs = require('fs')
+
+// let htmlPageNames = []
+// let entries = {
+//   main: path.resolve(__dirname, '../src/script.js'),
+// }
+
+// const readWriteEntries = async () => {
+//   await fs.readdir(path.resolve(__dirname, '../src'), (err, filename) => {
+//     htmlPageNames = filename
+//       .filter((file) => file.includes('html'))
+//       .map((file) => file.split('.')[0])
+
+//     htmlPageNames.forEach((page) => {
+//       entries[page] = path.resolve(__dirname, `../src/${page}.js`)
+//       console.log(entries)
+//     })
+//   })
+// }
+
 let htmlPageNames = [
   'lights',
   'text',
@@ -10,6 +30,7 @@ let htmlPageNames = [
   'house',
   'raycaster',
   'portfolio',
+  'physics',
 ]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
@@ -29,6 +50,7 @@ module.exports = {
     house: path.resolve(__dirname, '../src/house.js'),
     raycaster: path.resolve(__dirname, '../src/raycaster.js'),
     portfolio: path.resolve(__dirname, '../src/portfolio.js'),
+    physics: path.resolve(__dirname, '../src/physics.js'),
     //... repeat until example 4
   },
   output: {
