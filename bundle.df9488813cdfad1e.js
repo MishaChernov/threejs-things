@@ -66570,7 +66570,7 @@ const endShapeContactEvent = {
 
 
 const init = () => {
-  const hitSound = new Audio('/sounds/hit.mp3')
+  const hitSound = new Audio('sounds/hit.mp3')
 
   const sizes = {
     width: window.innerWidth,
@@ -66606,12 +66606,12 @@ const init = () => {
   const cubeTextureLoader = new CubeTextureLoader()
 
   const environmentMapTexture = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.png',
-    '/textures/environmentMaps/0/nx.png',
-    '/textures/environmentMaps/0/py.png',
-    '/textures/environmentMaps/0/ny.png',
-    '/textures/environmentMaps/0/pz.png',
-    '/textures/environmentMaps/0/nz.png',
+    'textures/environmentMaps/0/px.png',
+    'textures/environmentMaps/0/nx.png',
+    'textures/environmentMaps/0/py.png',
+    'textures/environmentMaps/0/ny.png',
+    'textures/environmentMaps/0/pz.png',
+    'textures/environmentMaps/0/nz.png',
   ])
 
   /**
@@ -66972,4 +66972,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.bdf88bf649553dbf.js.map
+//# sourceMappingURL=bundle.df9488813cdfad1e.js.map
