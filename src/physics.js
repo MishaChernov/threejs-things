@@ -20,14 +20,16 @@ const init = () => {
         y: 2 + Math.random() * 4,
         z: -0.5 + Math.random() * 2,
       }),
-    createBox: () =>
-      createBox(Math.random() * 0.5, Math.random() * 0.5, Math.random() * 0.5, {
+    createBox: () => {
+      const getRandomValue = () => 0.3 + Math.random() * 0.6
+
+      createBox(getRandomValue(), getRandomValue(), getRandomValue(), {
         x: -0.5 + Math.random() * 2,
         y: 2 + Math.random() * 4,
         z: -0.5 + Math.random() * 2,
-      }),
-    destroy: () => destroyMaterials,
-    playHitSound: () => playHitSound,
+      })
+    },
+    destroy: () => destroyMaterials(),
   }
 
   const worldGravity = new CANNON.Vec3(0, -9.82, 0)
@@ -35,12 +37,26 @@ const init = () => {
   const objectsToUpdate = []
 
   /**
+   * Texture Loader
+   */
+  const cubeTextureLoader = new THREE.CubeTextureLoader()
+
+  const environmentMapTexture = cubeTextureLoader.load([
+    '/textures/environmentMaps/0/px.png',
+    '/textures/environmentMaps/0/nx.png',
+    '/textures/environmentMaps/0/py.png',
+    '/textures/environmentMaps/0/ny.png',
+    '/textures/environmentMaps/0/pz.png',
+    '/textures/environmentMaps/0/nz.png',
+  ])
+
+  /**
    * Base
    */
   const gui = new dat.GUI({ width: 350 })
   gui.add(parameters, 'createSphere')
   gui.add(parameters, 'createBox')
-  gui.add(parameters, 'playHitSound')
+  gui.add(parameters, 'destroy')
 
   // Canvas
   const canvas = document.querySelector('canvas.webgl')
@@ -51,12 +67,15 @@ const init = () => {
   /**
    * Object
    */
-
-  const material = new THREE.MeshStandardMaterial({ color: '#5a626f' })
-
   const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshStandardMaterial({ color: '#335d33' })
+    new THREE.MeshStandardMaterial({
+      color: '#102610',
+      metalness: 0.3,
+      roughness: 0.4,
+      envMap: environmentMapTexture,
+      envMapIntensity: 0.5,
+    })
   )
   plane.rotation.x = -Math.PI * 0.5
   plane.position.y = 0
@@ -70,7 +89,7 @@ const init = () => {
     defaultMaterial,
     {
       friction: 0.1,
-      restitution: 0.7,
+      restitution: 0.4,
     }
   )
 
@@ -91,26 +110,39 @@ const init = () => {
   groundBody.quaternion.copy(plane.quaternion)
   world.addBody(groundBody)
 
-  const destroyMaterials = () => {
-    for (const obj of objectsToUpdate) {
-      obj.mesh.destroy()
-      obj.body.destroy()
+  const playHitSound = (event) => {
+    const impactVelocity = event.contact.getImpactVelocityAlongNormal()
+    const volume = normilizeNumber(impactVelocity + event.target.mass, 0, 35)
 
-      //TODO: Remove listeners
+    if (impactVelocity > 1) {
+      console.log(volume)
+      hitSound.volume = volume
+      hitSound.currentTime = 0
+      hitSound.play()
     }
-    objectsToUpdate = []
   }
 
-  const playHitSound = () => {
-    hitSound.play()
-    console.log('colide')
+  const destroyMaterials = () => {
+    for (const object of objectsToUpdate) {
+      world.removeBody(object.body)
+      scene.remove(object.mesh)
+
+      object.body.removeEventListener('collide', playHitSound)
+    }
+    objectsToUpdate.splice(0, objectsToUpdate.length - 1)
   }
+
+  const sphereGeometry = new THREE.SphereGeometry(1, 20, 20)
+  const sphereMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+    envMapIntensity: 0.5,
+  })
 
   const createSphere = (radius, position) => {
-    const mesh = new THREE.Mesh(
-      new THREE.SphereBufferGeometry(radius, 32, 32),
-      material
-    )
+    const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
+    mesh.scale.set(radius, radius, radius)
     mesh.castShadow = true
     mesh.receiveShadow = true
 
@@ -118,15 +150,16 @@ const init = () => {
 
     // Physics
     const body = new CANNON.Body({
-      mass: 1,
+      mass: normilizeNumber(radius + 0.5, 0, 1),
       shape: new CANNON.Sphere(radius),
       position,
       material: defaultMaterial,
     })
     body.collisionResponse = true
-    body.addEventListener('colide', playHitSound)
     // body.applyLocalForce(new CANNON.Vec3(150, 0, 0), new CANNON.Vec3(0, 0, 0))
     world.addBody(body)
+
+    body.addEventListener('collide', playHitSound)
 
     objectsToUpdate.push({
       body: body,
@@ -134,39 +167,44 @@ const init = () => {
     })
   }
 
-  createSphere(0.25, { x: 0, y: 3, z: 0 })
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+  const boxMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+    envMapIntensity: 0.5,
+  })
 
   const createBox = (width, height, depth, position) => {
-    const mesh = new THREE.Mesh(
-      new THREE.BoxBufferGeometry(width, height, depth),
-      material
-    )
+    const mesh = new THREE.Mesh(boxGeometry, boxMaterial)
+    mesh.scale.set(width, height, depth)
     mesh.castShadow = true
     mesh.receiveShadow = true
+    mesh.position.copy(position)
     scene.add(mesh)
 
     // Physics
     const halfExtends = new CANNON.Vec3(width * 0.5, height * 0.5, depth * 0.5)
     const body = new CANNON.Body({
-      mass: 1,
+      mass: normilizeNumber(width * 0.5 + height * 0.5 + depth * 0.5, 0, 1),
       shape: new CANNON.Box(halfExtends),
       position,
       material: defaultMaterial,
     })
+
     body.collisionResponse = true
-    body.addEventListener('colide', playHitSound)
     world.addBody(body)
+
+    body.addEventListener('collide', playHitSound)
 
     objectsToUpdate.push({
       body: body,
       mesh: mesh,
     })
   }
-
-  createBox(0.5, 0.5, 0.5, { x: 0, y: 2, z: 0 })
-
   // Lights
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7)
+  scene.add(ambientLight)
   gui
     .add(ambientLight, 'intensity')
     .min(0)
@@ -174,7 +212,7 @@ const init = () => {
     .step(0.001)
     .name('ambient intensity')
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
   directionalLight.castShadow = true
   directionalLight.shadow.mapSize.width = sizes.width
   directionalLight.shadow.mapSize.height = sizes.height
@@ -215,7 +253,7 @@ const init = () => {
   renderer.setSize(sizes.width, sizes.height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.shadowMap.enabled = true
-  // renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
   /**
    * Animate
@@ -260,6 +298,10 @@ const init = () => {
   const resizeButton = document.getElementById('resize-btn')
   const codeblockElement = document.getElementById('codeblock')
   const codeblockScreenPosition = codeblockElement.getBoundingClientRect()
+
+  function normilizeNumber(value, min, max) {
+    return (value - min) / (max - min)
+  }
 
   function updateSizes(width = window.innerWidth, height = window.innerHeight) {
     // Update sizes
