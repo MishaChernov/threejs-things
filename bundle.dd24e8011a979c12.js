@@ -66679,7 +66679,6 @@ const init = () => {
     const volume = normilizeNumber(impactVelocity + event.target.mass, 0, 35)
 
     if (impactVelocity > 1) {
-      console.log(volume)
       hitSound.volume = volume
       hitSound.currentTime = 0
       hitSound.play()
@@ -66972,4 +66971,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.df9488813cdfad1e.js.map
+//# sourceMappingURL=bundle.dd24e8011a979c12.js.map
