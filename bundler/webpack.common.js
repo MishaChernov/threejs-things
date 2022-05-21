@@ -31,6 +31,7 @@ let htmlPageNames = [
   'raycaster',
   'portfolio',
   'physics',
+  'models',
 ]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
@@ -51,6 +52,7 @@ module.exports = {
     raycaster: path.resolve(__dirname, '../src/raycaster.js'),
     portfolio: path.resolve(__dirname, '../src/portfolio.js'),
     physics: path.resolve(__dirname, '../src/physics.js'),
+    models: path.resolve(__dirname, '../src/models.js'),
     //... repeat until example 4
   },
   output: {
