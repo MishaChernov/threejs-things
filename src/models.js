@@ -2,6 +2,7 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import * as dat from 'dat.gui'
 
 const init = () => {
@@ -33,7 +34,11 @@ const init = () => {
   const scene = new THREE.Scene()
 
   // Loader
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('draco/')
   const gltfLoader = new GLTFLoader()
+  gltfLoader.setDRACOLoader(dracoLoader)
+
   const duckModel = gltfLoader.load(
     'models/Duck/glTF/Duck.gltf',
     (gltf) => {
@@ -77,6 +82,17 @@ const init = () => {
   gui.add(parameters, 'foxStay')
   gui.add(parameters, 'foxWalk')
   gui.add(parameters, 'foxRun')
+
+  const hamburgerModel = gltfLoader.load(
+    'models/Hamburger/Hamburger.gltf',
+    (gltf) => {
+      console.log('hamburger', gltf)
+      gltf.scene.position.z = 1.5
+      gltf.scene.scale.set(0.09, 0.09, 0.09)
+
+      scene.add(gltf.scene)
+    }
+  )
 
   /**
    * Object
