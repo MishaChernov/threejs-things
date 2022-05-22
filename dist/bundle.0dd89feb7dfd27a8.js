@@ -53843,7 +53843,7 @@ const init = () => {
    * Object
    */
   fontLoader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new TextGeometry_TextGeometry('Mykhailo Chernov', {
+    const textGeometry = new TextGeometry_TextGeometry('Mykhailo Chernov!', {
       font,
       size: 0.5,
       height: 0.2,
@@ -54058,4 +54058,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.ebd4f24b1633f348.js.map
+//# sourceMappingURL=bundle.0dd89feb7dfd27a8.js.map

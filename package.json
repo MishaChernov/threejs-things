@@ -4,8 +4,11 @@
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
     "dev": "webpack serve --config ./bundler/webpack.dev.js",
-    "deploy": "git add dist && git commit -m 'update' && gh-pages -d dist"
+    "gh-deploy": "echo \"Running deploy to gh-pages...\" && gh-pages -d dist"
   },
+  "pre-push": [
+    "gh-deploy"
+  ],
   "dependencies": {
     "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.16.11",
@@ -41,5 +44,8 @@
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.4.0",
     "webpack-merge": "^5.8.0"
+  },
+  "devDependencies": {
+    "git-push": "^0.1.1"
   }
 }
