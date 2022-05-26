@@ -58425,8 +58425,8 @@ const init = () => {
   }
 
   const parameters = {
-    ambientIntensity: 1,
-    directionalIntensity: 1,
+    ambientIntensity: 3,
+    directionalIntensity: 3,
     foxStay: () => playFoxAnimation(),
     foxWalk: () => playFoxAnimation(1),
     foxRun: () => playFoxAnimation(2),
@@ -58497,7 +58497,7 @@ const init = () => {
   gui.add(parameters, 'foxRun')
 
   const hamburgerModel = gltfLoader.load(
-    'models/Hamburger/Hamburger.gltf',
+    'models/Hamburger/Hamburger1.gltf',
     (gltf) => {
       console.log('hamburger', gltf)
       gltf.scene.position.z = 1.5
@@ -58564,6 +58564,7 @@ const init = () => {
   })
   renderer.setSize(sizes.width, sizes.height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.physicallyCorrectLights = true
 
   /**
    * Animate
@@ -58715,4 +58716,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.5e3928507fa59df4.js.map
+//# sourceMappingURL=bundle.4f113694c16607c1.js.map
