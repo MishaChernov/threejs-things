@@ -84,7 +84,7 @@ const init = () => {
   gui.add(parameters, 'foxRun')
 
   const hamburgerModel = gltfLoader.load(
-    'models/Hamburger/Hamburger1.gltf',
+    'models/Hamburger/Hamburger.gltf',
     (gltf) => {
       console.log('hamburger', gltf)
       gltf.scene.position.z = 1.5
