@@ -120,8 +120,8 @@ const init = () => {
     0xffffff,
     parameters.directionalIntensity
   )
-  gui.add(ambientLight, 'intensity').min(0).max(1).step(0.01)
-  gui.add(directionalLight, 'intensity').min(0).max(1).step(0.01)
+  gui.add(ambientLight, 'intensity').min(0).max(5).step(0.01)
+  gui.add(directionalLight, 'intensity').min(0).max(5).step(0.01)
   directionalLight.position.set(0, 2, 2)
   scene.add(ambientLight, directionalLight)
 
