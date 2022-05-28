@@ -14,9 +14,7 @@ const init = () => {
   const parameters = {
     ambientIntensity: 3,
     directionalIntensity: 3,
-    foxStay: () => playFoxAnimation(),
-    foxWalk: () => playFoxAnimation(1),
-    foxRun: () => playFoxAnimation(2),
+    envMapIntensity: 1.33,
   }
 
   let foxMixer = null
@@ -34,96 +32,117 @@ const init = () => {
   const scene = new THREE.Scene()
 
   // Loader
+  const cubeTextureLoader = new THREE.CubeTextureLoader()
   const dracoLoader = new DRACOLoader()
   dracoLoader.setDecoderPath('draco/')
   const gltfLoader = new GLTFLoader()
   gltfLoader.setDRACOLoader(dracoLoader)
 
-  const duckModel = gltfLoader.load(
-    'models/Duck/glTF/Duck.gltf',
-    (gltf) => {
-      console.log('duck loaded successfully')
-      gltf.scene.children[0].position.x = -0.5
-      gltf.scene.children[0].rotateY(-Math.PI * 0.5)
-      gltf.scene.children[0].scale.set(0.003, 0.003, 0.003)
-      scene.add(gltf.scene.children[0])
-    },
-    (gltf) => {
-      console.log('duck loading progress')
-    },
-    (gltf) => {
-      console.log('error')
-    }
-  )
+  const environmentMap = cubeTextureLoader.load([
+    'textures/environmentMaps/5/px.jpg',
+    'textures/environmentMaps/5/nx.jpg',
+    'textures/environmentMaps/5/py.jpg',
+    'textures/environmentMaps/5/ny.jpg',
+    'textures/environmentMaps/5/pz.jpg',
+    'textures/environmentMaps/5/nz.jpg',
+  ])
+
+  environmentMap.encoding = THREE.sRGBEncoding
+
+  scene.background = environmentMap
+  scene.environment = environmentMap
+
+  gui
+    .add(parameters, 'envMapIntensity')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .onChange(updateAllMaterials)
 
   const helmetModel = gltfLoader.load(
     'models/FlightHelmet/glTF/FlightHelmet.gltf',
     (gltf) => {
-      // const childrens = [...scene.children]
-      // for (const child of childrens) {
-      //   scene.add(child)
-      // }
-      console.log('helmet loaded successfully')
-      gltf.scene.position.x = 0.5
+      gltf.scene.position.x = 0
+      gltf.scene.position.y = -1.9
+      gltf.scene.scale.set(5, 5, 5)
+
+      gui
+        .add(gltf.scene.rotation, 'y')
+        .min(-Math.PI)
+        .max(Math.PI)
+        .step(0.001)
+        .name('rotation')
       scene.add(gltf.scene)
+
+      updateAllMaterials()
     }
   )
-
-  const foxModel = gltfLoader.load('models/Fox/glTF/Fox.gltf', (gltf) => {
-    console.log('fox', gltf)
-    gltf.scene.scale.set(0.009, 0.009, 0.009)
-    foxMixer = new THREE.AnimationMixer(gltf.scene)
-
-    foxAnimations = gltf.animations
-    playFoxAnimation()
-    scene.add(gltf.scene)
-  })
-
-  gui.add(parameters, 'foxStay')
-  gui.add(parameters, 'foxWalk')
-  gui.add(parameters, 'foxRun')
 
   const hamburgerModel = gltfLoader.load(
-    'models/Hamburger/Hamburger.gltf',
+    'models/Hamburger/Hamburger1.gltf',
     (gltf) => {
       console.log('hamburger', gltf)
-      gltf.scene.position.z = 1.5
-      gltf.scene.scale.set(0.09, 0.09, 0.09)
+      gltf.scene.position.set(0.468, -1.385, -0.572)
+      gltf.scene.scale.set(0.05, 0.05, 0.05)
+
+      gui
+        .add(gltf.scene.position, 'y')
+        .min(-2)
+        .max(3)
+        .step(0.001)
+        .name('hamburger y')
+      gui
+        .add(gltf.scene.position, 'x')
+        .min(-2)
+        .max(3)
+        .step(0.001)
+        .name('hamburger x')
+      gui
+        .add(gltf.scene.position, 'z')
+        .min(-1)
+        .max(3)
+        .step(0.001)
+        .name('hamburger z')
 
       scene.add(gltf.scene)
     }
   )
-
-  /**
-   * Object
-   */
-
-  const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry(5, 5),
-    new THREE.MeshStandardMaterial({
-      color: '#5a626f',
-    })
-  )
-  plane.rotation.x = -Math.PI * 0.5
-  plane.position.y = 0
-  scene.add(plane)
 
   /**
    * Lights
    */
+  const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
+  directionalLight.castShadow = true
+  directionalLight.shadow.camera.far = 15
+  directionalLight.shadow.mapSize.set(1024, 1024)
+  directionalLight.shadow.normalBias = 0.05
+  directionalLight.position.set(0.25, 3, -2.25)
+  scene.add(directionalLight)
 
-  const ambientLight = new THREE.AmbientLight(
-    0xffffff,
-    parameters.ambientIntensity
-  )
-  const directionalLight = new THREE.DirectionalLight(
-    0xffffff,
-    parameters.directionalIntensity
-  )
-  gui.add(ambientLight, 'intensity').min(0).max(1).step(0.01)
-  gui.add(directionalLight, 'intensity').min(0).max(1).step(0.01)
-  directionalLight.position.set(0, 2, 2)
-  scene.add(ambientLight, directionalLight)
+  gui
+    .add(directionalLight, 'intensity')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('lightIntensity')
+  gui
+    .add(directionalLight.position, 'x')
+    .min(-5)
+    .max(5)
+    .step(0.001)
+    .name('lightX')
+  gui
+    .add(directionalLight.position, 'y')
+    .min(-5)
+    .max(5)
+    .step(0.001)
+    .name('lightY')
+  gui
+    .add(directionalLight.position, 'z')
+    .min(-5)
+    .max(5)
+    .step(0.001)
+    .name('lightZ')
 
   /**
    * Camera
@@ -148,10 +167,25 @@ const init = () => {
    */
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
+    antialias: window.devicePixelRatio < 2,
   })
   renderer.setSize(sizes.width, sizes.height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   renderer.physicallyCorrectLights = true
+  renderer.outputEncoding = THREE.sRGBEncoding
+  renderer.toneMapping = THREE.ReinhardToneMapping
+  renderer.toneMappingExposure = 3
+  renderer.shadowMap.enabled = true
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+  gui.add(renderer, 'toneMapping', {
+    No: THREE.NoToneMapping,
+    Linear: THREE.LinearToneMapping,
+    Reinhard: THREE.ReinhardToneMapping,
+    Cineon: THREE.CineonToneMapping,
+    ACESFilmic: THREE.ACESFilmicToneMapping,
+  })
+  gui.add(renderer, 'toneMappingExposure').min(0).max(10).step(0.001)
 
   /**
    * Animate
@@ -167,11 +201,9 @@ const init = () => {
     // Update controls
     controls.update()
 
-    // Animation mixer updates
-    foxMixer?.update(deltaTime)
-
     // Render
     renderer.render(scene, camera)
+    camera.updateProjectionMatrix()
 
     // Appear/disapear codeblock on the page
     if (codeblock.shouldBeVisible != codeblock.isVisible) {
@@ -192,10 +224,21 @@ const init = () => {
   const codeblockElement = document.getElementById('codeblock')
   const codeblockScreenPosition = codeblockElement.getBoundingClientRect()
 
-  function playFoxAnimation(value = 0) {
-    foxMixer?.stopAllAction()
-    const action = foxMixer?.clipAction(foxAnimations[value])
-    action.play()
+  /**
+   * Update all materials
+   */
+
+  function updateAllMaterials() {
+    scene.traverse((child) => {
+      if (
+        child instanceof THREE.Mesh &&
+        child.material instanceof THREE.MeshStandardMaterial
+      ) {
+        child.material.envMapIntensity = parameters.envMapIntensity
+        child.castShadow = true
+        child.receiveShadow = true
+      }
+    })
   }
 
   function updateSizes(width = window.innerWidth, height = window.innerHeight) {
@@ -281,6 +324,20 @@ const init = () => {
       codeblock.shouldBeVisible = !shouldBeVisible
       console.log('Toggle code block')
     }
+  })
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
   })
 
   let isFullScreen = false
