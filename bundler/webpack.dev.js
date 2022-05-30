@@ -21,7 +21,7 @@ module.exports = merge(commonConfiguration, {
     https: false,
     allowedHosts: 'all',
     hot: false,
-    watchFiles: ['src/**', 'static/**'],
+    watchFiles: ['src/**', 'components/**', 'static/**'],
     static: {
       watch: true,
       directory: path.join(__dirname, '../static'),
