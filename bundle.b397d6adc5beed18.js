@@ -58475,12 +58475,12 @@ const init = () => {
    * Environment map
    */
   const environmentMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/5/px.jpg',
-    '/textures/environmentMaps/5/nx.jpg',
-    '/textures/environmentMaps/5/py.jpg',
-    '/textures/environmentMaps/5/ny.jpg',
-    '/textures/environmentMaps/5/pz.jpg',
-    '/textures/environmentMaps/5/nz.jpg',
+    'textures/environmentMaps/5/nx.jpg',
+    'textures/environmentMaps/5/py.jpg',
+    'textures/environmentMaps/5/px.jpg',
+    'textures/environmentMaps/5/ny.jpg',
+    'textures/environmentMaps/5/pz.jpg',
+    'textures/environmentMaps/5/nz.jpg',
   ])
 
   environmentMap.encoding = sRGBEncoding
@@ -58757,4 +58757,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.1bd801ee9536bc05.js.map
+//# sourceMappingURL=bundle.b397d6adc5beed18.js.map
