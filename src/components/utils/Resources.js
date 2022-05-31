@@ -1,17 +1,15 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-
-import App from '../App'
-import EventEmitter from './EventEmmiter'
+import EventEmitter from './EventEmitter'
 
 export default class Resources extends EventEmitter {
   constructor(sources) {
     super()
-    this.loadedCount = 0
-    this.textures = {}
+    this.loaded = 0
+    this.items = {}
     this.sources = sources
+    this.toLoad = this.sources.length
 
-    this.app = new App()
     this.gltfLoader = new GLTFLoader()
     this.textureLoader = new THREE.TextureLoader()
     this.cubeTextureLoader = new THREE.CubeTextureLoader()
@@ -20,31 +18,37 @@ export default class Resources extends EventEmitter {
   }
 
   setTexture(name, texture) {
-    this.textures[name] = texture
+    this.items[name] = texture
+  }
+
+  sourceLoaded(source, file) {
+    this.items[source.name] = file
+
+    this.loaded++
+
+    if (this.loaded === this.toLoad) {
+      this.trigger('ready')
+    }
+  }
+
+  getTexture(name) {
+    return this.items[name]
   }
 
   onLoad() {
     for (const source of this.sources) {
       if (source.type === 'glTF') {
         this.gltfLoader.load(source.path, (gltf) => {
-          this.setTexture(source.name, gltf)
+          this.sourceLoaded(source, gltf)
         })
-        this.loadedCount++
       } else if (source.type === 'cubeTexture') {
         this.cubeTextureLoader.load(source.path, (texture) => {
-          this.setTexture(source.name, texture)
+          this.sourceLoaded(source, texture)
         })
-        this.loadedCount++
       } else if (source.type === 'texture') {
         this.textureLoader.load(source.path, (texture) => {
-          this.setTexture(source.name, texture)
+          this.sourceLoaded(source, texture)
         })
-        this.loadedCount++
-      }
-
-      if (this.loadedCount === this.sources.length) {
-        this.trigger('resources-loaded', this.textures)
-        this.app.resources = this.textures
       }
     }
   }

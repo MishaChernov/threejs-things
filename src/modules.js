@@ -1,4 +1,4 @@
 import './style.css'
-import App from '../components/modules/App'
+import App from './components/App'
 
-const app = new App()
+new App(document.querySelector('canvas.webgl'))
