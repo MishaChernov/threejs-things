@@ -35,6 +35,7 @@ let htmlPageNames = [
   'realisticRender',
   'modules',
   'shaders',
+  'shaderPatterns',
 ]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
@@ -59,6 +60,7 @@ module.exports = {
     realisticRender: path.resolve(__dirname, '../src/realisticRender.js'),
     modules: path.resolve(__dirname, '../src/modules.js'),
     shaders: path.resolve(__dirname, '../src/shaders.js'),
+    shaderPatterns: path.resolve(__dirname, '../src/shaderPatterns.js'),
     //... repeat until example 4
   },
   output: {
