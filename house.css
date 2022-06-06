@@ -165,11 +165,16 @@ body {
 
 .main-page__title {
   margin: 30px;
+  margin-bottom: 0;
   font-weight: bold;
   text-transform: uppercase;
   font-size: 60px;
   font-family: 'Open Sans Condensed', sans-serif;
   text-align: center;
+}
+
+.main-page__text {
+  margin-bottom: 30px;
 }
 
 .nav {
