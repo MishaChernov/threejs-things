@@ -53805,8 +53805,7 @@ let fontLoaded = null
 /**
  * Base
  */
-const shaderPatterns_gui = new GUI$1({ width: 350 })
-shaderPatterns_gui.isVisible = false
+// const gui = new dat.GUI({ width: 350 })
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -53894,123 +53893,201 @@ float cnoise(vec2 P)
 function createFragmentsArray() {
   return {
     pattern1: `
-        void main() {
-          gl_FragColor = vec4(vUv, 1.0, 1.0);
-        }
-      `,
+        isOwnColor = true;
+        gl_FragColor = vec4(vUv, 1.0, 1.0);
+        float strength = vUv.x;
+    `,
     pattern2: `
-        void main() {
-          gl_FragColor = vec4(vUv, 0.0, 1.0);
-        }
-      `,
+        isOwnColor = true;
+        gl_FragColor = vec4(vUv, 0.0, 1.0);
+        float strength = vUv.x;
+    `,
     pattern3: `
-        void main() {
-          float strength = vUv.x;
-
-          gl_FragColor = vec4(vec3(strength), 1.0);
-        }
-      `,
+        float strength = vUv.x;
+    `,
     pattern4: `
-        void main() {
-          float strength = vUv.y;
-
-          gl_FragColor = vec4(vec3(strength), 1.0);
-        }
-      `,
+        float strength = vUv.y;
+    `,
     pattern5: `
-        void main() {
-          float strength = 1.0 - vUv.y;
-
-          gl_FragColor = vec4(vec3(strength), 1.0);
-        }
-      `,
+        float strength = 1.0 - vUv.y;
+    `,
     pattern6: `
-        void main() {
-          float strength = vUv.y * 10.0;
-
-          gl_FragColor = vec4(vec3(strength), 1.0);
-        }
-      `,
+        float strength = vUv.y * 10.0;
+    `,
     pattern7: `
-      void main() {
         float strength = mod(vUv.y * 10.0, 1.0);
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern8: `
-      void main() {
         float strength = mod(vUv.y * 10.0, 1.0);
         strength = step(0.5, strength);
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern9: `
-      void main() {
         float strength = mod(vUv.y * 10.0, 1.0);
         strength = step(0.8, strength);
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern10: `
-      void main() {
         float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern11: `
-      void main() {
         float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
         strength += step(0.8, mod(vUv.y * 10.0, 1.0));
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
+        strength = clamp(strength, 0.0, 1.0);
     `,
     pattern12: `
-      void main() {
         float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
         strength *= step(0.8, mod(vUv.y * 10.0, 1.0));
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern13: `
-      void main() {
         float strength = step(0.8, mod(vUv.y * 10.0, 1.0));
         strength -= step(0.6, mod(vUv.x * 10.0, 1.0));
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
     `,
     pattern14: `
-      void main() {
         float barX = step(0.4, mod(vUv.x * 10.0, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
         float barY = step(0.8, mod(vUv.x * 10.0, 1.0)) * step(0.4, mod(vUv.y * 10.0, 1.0));
         float strength = barX + barY;
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
+        strength = clamp(strength, 0.0, 1.0);
     `,
     pattern15: `
-      void main() {
         float barX = step(0.4, mod(vUv.x * 10.0 - 0.2, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
         float barY = step(0.8, mod(vUv.x * 10.0 , 1.0)) * step(0.4, mod(vUv.y * 10.0 -0.2, 1.0));
         float strength = barX + barY;
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
+        strength = clamp(strength, 0.0, 1.0);
     `,
-    pattern15: `
-      void main() {
-        float barX = step(0.4, mod(vUv.x * 10.0 - 0.2, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
-        float barY = step(0.8, mod(vUv.x * 10.0 , 1.0)) * step(0.4, mod(vUv.y * 10.0 -0.2, 1.0));
-        float strength = barX + barY;
-
-        gl_FragColor = vec4(vec3(strength), 1.0);
-      }
+    pattern16: `
+        float strength = abs(vUv.x - 0.5);
+    `,
+    pattern17: `
+        float strength = min(abs(vUv.x - 0.5), abs(vUv.y - 0.5));
+    `,
+    pattern18: `
+        float strength = max(abs(vUv.x - 0.5), abs(vUv.y - 0.5));
+    `,
+    pattern19: `
+        float strength = step(0.2, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));
+    `,
+    pattern20: `
+        float strengthX = 1.0 - step(0.3, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));
+        float strengthY = step(0.25, max(abs(vUv.x - 0.5), abs(vUv.y - 0.5)));
+        float strength = strengthX * strengthY;
+    `,
+    pattern21: `
+        float strength = floor(vUv.x * 10.0) / 10.0;
+    `,
+    pattern22: `
+        float strength = floor(vUv.x * 10.0) / 10.0;
+        strength *= floor(vUv.y * 10.0) / 10.0;
+    `,
+    pattern23: `
+        float strength = random(vUv);
+    `,
+    pattern24: `
+        vec2 gridUv = vec2(floor(vUv.x * 10.0) / 10.0, floor(vUv.y * 10.0) / 10.0);
+        float strength = random(gridUv);
+    `,
+    pattern25: `
+        vec2 gridUv = vec2(floor(vUv.x * 10.0) / 10.0, floor((vUv.y + vUv.x * 0.5) * 10.0) / 10.0);
+        float strength = random(gridUv);
+    `,
+    pattern26: `
+        float strength = length(vUv);
+    `,
+    pattern27: `
+        float strength = distance(vUv, vec2(0.5));
+    `,
+    pattern28: `
+        float strength = 1.0 - distance(vUv, vec2(0.5));
+    `,
+    pattern29: `
+        float strength = 0.015 / distance(vUv, vec2(0.5));
+    `,
+    pattern30: `
+        float strength = 0.15 / (distance(vec2(vUv.x, (vUv.y - 0.5) * 5.0 + 0.5), vec2(0.5)));
+    `,
+    pattern31: `
+        float strength = 0.15 / (distance(vec2(vUv.x, (vUv.y - 0.5) * 5.0 + 0.5), vec2(0.5)));
+        strength *= 0.15 / (distance(vec2(vUv.y, (vUv.x - 0.5) * 5.0 + 0.5), vec2(0.5)));
+    `,
+    pattern32: `
+        vec2 rotatedUv = rotate(vUv, PI * 0.25, vec2(0.5));
+        float strength = 0.15 / (distance(vec2(rotatedUv.x, (rotatedUv.y - 0.5) * 5.0 + 0.5), vec2(0.5)));
+        strength *= 0.15 / (distance(vec2(rotatedUv.y, (rotatedUv.x - 0.5) * 5.0 + 0.5), vec2(0.5)));
+    `,
+    pattern33: `
+        float strength = step(0.5, distance(vUv, vec2(0.5)) + 0.25);
+    `,
+    pattern34: `
+        float strength = abs( distance(vUv, vec2(0.5)) - 0.25);
+    `,
+    pattern35: `
+        float strength = step(0.02, abs(distance(vUv, vec2(0.5)) - 0.25));
+    `,
+    pattern36: `
+        float strength = 1.0 - step(0.01, abs(distance(vUv, vec2(0.5)) - 0.25));
+    `,
+    pattern37: `
+        vec2 wavedUv = vec2(
+          vUv.x,
+          vUv.y + sin(vUv.x * 30.0) * 0.1
+      );
+        float strength = 1.0 - step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    `,
+    pattern38: `
+        vec2 wavedUv = vec2(
+          vUv.x + sin(vUv.y * 30.0) * 0.1,
+          vUv.y + sin(vUv.x * 30.0) * 0.1
+      );
+        float strength = 1.0 - step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    `,
+    pattern39: `
+        vec2 wavedUv = vec2(
+          vUv.x + sin(vUv.y * 100.0) * 0.1,
+          vUv.y + sin(vUv.x * 100.0) * 0.1
+      );
+        float strength = 1.0 - step(0.01, abs(distance(wavedUv, vec2(0.5)) - 0.25));
+    `,
+    pattern40: `
+        float strength = atan(vUv.x, vUv.y);
+    `,
+    pattern41: `
+        float strength = atan(vUv.x - 0.5, vUv.y - 0.5);
+    `,
+    pattern42: `
+        float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+        angle /= PI * 2.0;
+        angle += 0.5;
+        float strength = angle;
+    `,
+    pattern43: `
+        float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+        angle /= PI * 2.0;
+        angle += 0.5;
+        float strength = mod(angle * 20.0, 1.0);
+    `,
+    pattern44: `
+        float angle = atan(vUv.x - 0.5, vUv.y - 0.5);
+        angle /= PI * 2.0;
+        angle += 0.5;
+        float strength = sin(angle * 100.0);
+    `,
+    pattern45: `
+        float angle = atan(vUv.x - 0.5, vUv.y - 0.5) / (PI * 2.0) + 0.5;
+        float radius = 0.25 + sin(angle * 100.0) * 0.02;
+        float strength = 1.0 - step(0.01, abs(distance(vUv, vec2(0.5)) - radius));
+    `,
+    pattern46: `
+        float strength = cnoise(vUv * 10.0);
+    `,
+    pattern47: `
+        float strength = step(0.0, cnoise(vUv * 10.0));
+    `,
+    pattern48: `
+        float strength = 1.0 - abs(cnoise(vUv * 10.0));
+    `,
+    pattern49: `
+        float strength = sin(cnoise(vUv * 10.0) * 20.0);
+    `,
+    pattern50: `
+        float strength = step(0.9, sin(cnoise(vUv * 10.0) * 20.0);
     `,
   }
 }
@@ -54028,7 +54105,18 @@ for (let key in shaderFragmentMainFunctionPatterns) {
     vertexShader: vertexFromPattern,
     fragmentShader: `
         ${shaderFragmentGeneralCode}
-        ${shaderFragmentMainFunctionPatterns[key]}
+        void main() {
+          bool isOwnColor = false;
+
+          ${shaderFragmentMainFunctionPatterns[key]}
+
+          if (isOwnColor == false) {
+            vec3 blackColor = vec3(0.0);
+            vec3 uvColor = vec3(vUv, 1.0);
+            vec3 mixedColor = mix(blackColor, uvColor, strength);
+            gl_FragColor = vec4(mixedColor, 1.0);
+          }
+        }
       `,
   })
 
@@ -54141,19 +54229,6 @@ const resizeButton = document.getElementById('resize-btn')
 const codeblockElement = document.getElementById('codeblock')
 const codeblockScreenPosition = codeblockElement.getBoundingClientRect()
 
-function normalize(val, min, max) {
-  // Shift to positive to avoid issues when crossing the 0 line
-  if (min < 0) {
-    max += 0 - min
-    val += 0 - min
-    min = 0
-  }
-  // Shift values from 0 - max
-  val = val - min
-  max = max - min
-  return Math.max(0, Math.min(1, val / max))
-}
-
 function updateSizes(width = window.innerWidth, height = window.innerHeight) {
   // Update sizes
   sizes.width = width
@@ -54174,12 +54249,12 @@ function toogleCodeblock() {
   if (codeblock.isVisible) {
     codeblockElement.style.marginLeft = '50%'
     updateSizes(window.innerWidth / 2, window.innerHeight)
-    stickGuiLeft()
+    // stickGuiLeft()
   } else {
     codeblockElement.style.marginLeft = '100%'
     codeblockElement.style.width = '50vw'
     updateSizes()
-    stickGuiRight()
+    // stickGuiRight()
   }
 }
 
@@ -54262,4 +54337,4 @@ code.innerHTML = createFragmentsArray.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.fb98e3d3794f3ed8.js.map
+//# sourceMappingURL=bundle.e6db4d7106701258.js.map
