@@ -2,17 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 319:
+/***/ 606:
 /***/ ((module) => {
 
-module.exports = "precision mediump float;\n\nuniform vec3 uColor;\nuniform sampler2D uTexture;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main() {\n  vec4 textureColor = texture2D(uTexture, vUv);\n  textureColor.rgb *= vElevation * 2.0 + 0.5;\n  gl_FragColor = textureColor;\n}";
-
-/***/ }),
-
-/***/ 377:
-/***/ ((module) => {
-
-module.exports = "uniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 modelMatrix;\nuniform vec2 uFrequency;\nuniform float uTime;\n\nattribute vec2 uv;\nattribute vec3 position;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main() {\n    vec4 modelPosition = modelMatrix * vec4(position, 1.0);\n    modelPosition.z += sin(modelPosition.x * uFrequency.x - uTime) * 0.01;\n    modelPosition.z += sin(modelPosition.y * uFrequency.y - uTime) * 0.02;\n    float elevation = sin(modelPosition.x * uFrequency.x - uTime) * 0.06;\n\n    modelPosition.z += elevation;\n\n    vec4 viewPosition = viewMatrix * modelPosition;\n    vec4 projectedPosition = projectionMatrix * viewPosition;\n\n\n\n    gl_Position = projectedPosition;\n\n    vUv = uv;\n    vElevation = elevation;\n}";
+module.exports = "varying vec2 vUv;\n\nvoid main()\n{\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n\n    vUv = uv;\n}";
 
 /***/ })
 
@@ -51069,6 +51062,200 @@ class MapControls extends (/* unused pure expression or super */ null && (OrbitC
 
 
 
+;// CONCATENATED MODULE: ./node_modules/three/examples/jsm/loaders/FontLoader.js
+
+
+class FontLoader_FontLoader extends Loader {
+
+	constructor( manager ) {
+
+		super( manager );
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
+
+		const scope = this;
+
+		const loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
+		loader.load( url, function ( text ) {
+
+			let json;
+
+			try {
+
+				json = JSON.parse( text );
+
+			} catch ( e ) {
+
+				console.warn( 'THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.' );
+				json = JSON.parse( text.substring( 65, text.length - 2 ) );
+
+			}
+
+			const font = scope.parse( json );
+
+			if ( onLoad ) onLoad( font );
+
+		}, onProgress, onError );
+
+	}
+
+	parse( json ) {
+
+		return new FontLoader_Font( json );
+
+	}
+
+}
+
+//
+
+class FontLoader_Font {
+
+	constructor( data ) {
+
+		this.type = 'Font';
+
+		this.data = data;
+
+	}
+
+	generateShapes( text, size = 100 ) {
+
+		const shapes = [];
+		const paths = createPaths( text, size, this.data );
+
+		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
+
+			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
+
+		}
+
+		return shapes;
+
+	}
+
+}
+
+function createPaths( text, size, data ) {
+
+	const chars = Array.from( text );
+	const scale = size / data.resolution;
+	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+
+	const paths = [];
+
+	let offsetX = 0, offsetY = 0;
+
+	for ( let i = 0; i < chars.length; i ++ ) {
+
+		const char = chars[ i ];
+
+		if ( char === '\n' ) {
+
+			offsetX = 0;
+			offsetY -= line_height;
+
+		} else {
+
+			const ret = createPath( char, scale, offsetX, offsetY, data );
+			offsetX += ret.offsetX;
+			paths.push( ret.path );
+
+		}
+
+	}
+
+	return paths;
+
+}
+
+function createPath( char, scale, offsetX, offsetY, data ) {
+
+	const glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
+
+	if ( ! glyph ) {
+
+		console.error( 'THREE.Font: character "' + char + '" does not exists in font family ' + data.familyName + '.' );
+
+		return;
+
+	}
+
+	const path = new ShapePath();
+
+	let x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
+
+	if ( glyph.o ) {
+
+		const outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
+
+		for ( let i = 0, l = outline.length; i < l; ) {
+
+			const action = outline[ i ++ ];
+
+			switch ( action ) {
+
+				case 'm': // moveTo
+
+					x = outline[ i ++ ] * scale + offsetX;
+					y = outline[ i ++ ] * scale + offsetY;
+
+					path.moveTo( x, y );
+
+					break;
+
+				case 'l': // lineTo
+
+					x = outline[ i ++ ] * scale + offsetX;
+					y = outline[ i ++ ] * scale + offsetY;
+
+					path.lineTo( x, y );
+
+					break;
+
+				case 'q': // quadraticCurveTo
+
+					cpx = outline[ i ++ ] * scale + offsetX;
+					cpy = outline[ i ++ ] * scale + offsetY;
+					cpx1 = outline[ i ++ ] * scale + offsetX;
+					cpy1 = outline[ i ++ ] * scale + offsetY;
+
+					path.quadraticCurveTo( cpx1, cpy1, cpx, cpy );
+
+					break;
+
+				case 'b': // bezierCurveTo
+
+					cpx = outline[ i ++ ] * scale + offsetX;
+					cpy = outline[ i ++ ] * scale + offsetY;
+					cpx1 = outline[ i ++ ] * scale + offsetX;
+					cpy1 = outline[ i ++ ] * scale + offsetY;
+					cpx2 = outline[ i ++ ] * scale + offsetX;
+					cpy2 = outline[ i ++ ] * scale + offsetY;
+
+					path.bezierCurveTo( cpx1, cpy1, cpx2, cpy2, cpx, cpy );
+
+					break;
+
+			}
+
+		}
+
+	}
+
+	return { offsetX: glyph.ha * scale, path: path };
+
+}
+
+FontLoader_Font.prototype.isFont = true;
+
+
+
 ;// CONCATENATED MODULE: ./node_modules/dat.gui/build/dat.gui.module.js
 /**
  * dat-gui JavaScript Controller Library
@@ -53595,10 +53782,8 @@ var index = {
 /* harmony default export */ const dat_gui_module = ((/* unused pure expression or super */ null && (index)));
 //# sourceMappingURL=dat.gui.module.js.map
 
-// EXTERNAL MODULE: ./src/shaders/vertex.glsl
-var shaders_vertex = __webpack_require__(377);
-// EXTERNAL MODULE: ./src/shaders/fragment.glsl
-var shaders_fragment = __webpack_require__(319);
+// EXTERNAL MODULE: ./src/shaders/vertexFromPattern.glsl
+var vertexFromPattern = __webpack_require__(606);
 ;// CONCATENATED MODULE: ./src/shaderPatterns.js
 
 
@@ -53608,251 +53793,473 @@ var shaders_fragment = __webpack_require__(319);
 
 
 
-const init = () => {
-  const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  }
 
-  /**
-   * Base
-   */
-  const gui = new GUI$1({ width: 350 })
-
-  // Canvas
-  const canvas = document.querySelector('canvas.webgl')
-
-  // Scene
-  const scene = new Scene()
-
-  // Loaders
-  const textureLoader = new TextureLoader()
-  const flagTexture = textureLoader.load('ukraine-flag.png')
-
-  /**
-   * Object
-   */
-
-  const shaderGeometry = new PlaneGeometry(1, 1, 32, 32)
-
-  const count = shaderGeometry.attributes.position.count
-  const randoms = new Float32Array(count)
-
-  for (let i = 0; i < count; i++) {
-    randoms[i] = Math.random()
-  }
-
-  shaderGeometry.setAttribute('aRandom', new BufferAttribute(randoms, 1))
-
-  const shaderMaterial = new RawShaderMaterial({
-    vertexShader: shaders_vertex,
-    fragmentShader: shaders_fragment,
-    uniforms: {
-      uFrequency: { value: new Vector2(10, 5) },
-      uTime: { value: 0 },
-      uColor: { value: new Color('orange') },
-      uTexture: { value: flagTexture },
-    },
-  })
-  const shaderMesh = new Mesh(shaderGeometry, shaderMaterial)
-
-  shaderMesh.scale.y = 2 / 3
-
-  gui
-    .add(shaderMaterial.uniforms.uFrequency.value, 'x')
-    .min(0)
-    .max(20)
-    .step(0.01)
-    .name('frequencyX')
-  gui
-    .add(shaderMaterial.uniforms.uFrequency.value, 'y')
-    .min(0)
-    .max(20)
-    .step(0.01)
-    .name('frequencyY')
-
-  scene.add(shaderMesh)
-
-  /**
-   * Lights
-   */
-
-  const directionalLight = new DirectionalLight(0xffffff, 1)
-  directionalLight.position.set(0, 2, 2)
-  scene.add(directionalLight)
-
-  /**
-   * Camera
-   */
-  // Base camera
-  const camera = new PerspectiveCamera(
-    35,
-    sizes.width / sizes.height,
-    0.1,
-    100
-  )
-  camera.position.z = 4
-  camera.position.y = 2
-  scene.add(camera)
-
-  // Controls
-  const controls = new OrbitControls(camera, canvas)
-  controls.enableDamping = true
-
-  /**
-   * Renderer
-   */
-  const renderer = new WebGLRenderer({
-    canvas: canvas,
-  })
-  renderer.setSize(sizes.width, sizes.height)
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  renderer.physicallyCorrectLights = true
-
-  /**
-   * Animate
-   */
-  const clock = new Clock()
-  let previousTime = 0
-
-  const tick = () => {
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
-
-    // Update material
-    shaderMaterial.uniforms.uTime.value = elapsedTime
-
-    // Update controls
-    controls.update()
-
-    // Render
-    renderer.render(scene, camera)
-
-    // Appear/disapear codeblock on the page
-    if (codeblock.shouldBeVisible != codeblock.isVisible) {
-      toogleCodeblock()
-    }
-
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
-  }
-
-  tick()
-
-  /*
-   * Helpers
-   */
-
-  const resizeButton = document.getElementById('resize-btn')
-  const codeblockElement = document.getElementById('codeblock')
-  const codeblockScreenPosition = codeblockElement.getBoundingClientRect()
-
-  function updateSizes(width = window.innerWidth, height = window.innerHeight) {
-    // Update sizes
-    sizes.width = width
-    sizes.height = height
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  }
-
-  function toogleCodeblock() {
-    codeblock.isVisible = !codeblock.isVisible
-
-    if (codeblock.isVisible) {
-      codeblockElement.style.marginLeft = '50%'
-      updateSizes(window.innerWidth / 2, window.innerHeight)
-      stickGuiLeft()
-    } else {
-      codeblockElement.style.marginLeft = '100%'
-      codeblockElement.style.width = '50vw'
-      updateSizes()
-      stickGuiRight()
-    }
-  }
-
-  function stickGuiLeft() {
-    document.getElementsByClassName('dg main a')[0].style.marginLeft = '0'
-    document.getElementsByClassName('dg main a')[0].style.marginRight = '100%'
-    document.getElementsByClassName('dg main a')[0].style.transform =
-      'translateX(0%)'
-  }
-  ;``
-  function stickGuiRight() {
-    document.getElementsByClassName('dg main a')[0].style.marginLeft = '100%'
-    document.getElementsByClassName('dg main a')[0].style.marginRight = '0%'
-    document.getElementsByClassName('dg main a')[0].style.transform =
-      'translateX(-100%)'
-  }
-
-  function handleMouseMove(e) {
-    const availableZone = e.clientX < window.innerWidth - 35
-    const { shouldBeVisible, mouseDownResize, isVisible } = codeblock
-
-    if (!availableZone && shouldBeVisible && mouseDownResize) {
-      codeblock.shouldBeVisible = !shouldBeVisible
-      codeblock.mouseDownResize = false
-    }
-
-    if (isVisible && availableZone && shouldBeVisible && mouseDownResize) {
-      codeblockElement.style.marginLeft = e.clientX + 'px'
-
-      if (e.clientX < codeblockScreenPosition.x) {
-        codeblockElement.style.width = window.innerWidth - e.clientX + 'px'
-      }
-
-      updateSizes(e.clientX, window.innerHeight)
-    }
-  }
-
-  resizeButton.addEventListener('mousedown', function () {
-    codeblock.mouseDownResize = true
-    document.addEventListener('mousemove', handleMouseMove)
-    canvas.style.transition = 'none'
-    codeblockElement.style.transition = 'none'
-  })
-
-  resizeButton.addEventListener('mouseup', function () {
-    codeblock.mouseDownResize = false
-    canvas.style.transition = 'width 0.5s ease-in-out'
-    codeblockElement.style.transition = 'margin 0.5s ease-in-out;'
-  })
-
-  document.addEventListener('keypress', (e) => {
-    const { shouldBeVisible } = codeblock
-
-    if (e.code === 'KeyG') {
-      codeblock.shouldBeVisible = !shouldBeVisible
-      console.log('Toggle code block')
-    }
-  })
-
-  let isFullScreen = false
-
-  canvas.addEventListener('dblclick', (e) => {
-    if (!isFullScreen) {
-      canvas.requestFullscreen()
-    } else {
-      document.exitFullscreen()
-    }
-    isFullScreen = !isFullScreen
-  })
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight,
 }
 
-init()
+let currentScroll = 0
+let fontLoaded = null
+
+/**
+ * Base
+ */
+const shaderPatterns_gui = new GUI$1({ width: 350 })
+shaderPatterns_gui.isVisible = false
+
+// Canvas
+const canvas = document.querySelector('canvas.webgl')
+
+// Scene
+const scene = new Scene()
+
+// Loaders
+const textureLoader = new TextureLoader()
+const fontLoader = new FontLoader_FontLoader()
+
+fontLoader.load('./fonts/helvetiker_regular.typeface.json', (font) => {
+  console.log(font)
+  fontLoaded = font
+})
+
+/**
+ * Object
+ */
+
+const shaderFragmentGeneralCode = `
+#define PI 3.1415926535897932384626433832795
+
+varying vec2 vUv;
+
+float random(vec2 st)
+{
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
+vec2 rotate(vec2 uv, float rotation, vec2 mid)
+{
+    return vec2(
+      cos(rotation) * (uv.x - mid.x) + sin(rotation) * (uv.y - mid.y) + mid.x,
+      cos(rotation) * (uv.y - mid.y) - sin(rotation) * (uv.x - mid.x) + mid.y
+    );
+}
+
+//	Classic Perlin 2D Noise 
+//	by Stefan Gustavson
+//
+vec4 permute(vec4 x)
+{
+    return mod(((x*34.0)+1.0)*x, 289.0);
+}
+
+vec2 fade(vec2 t)
+{
+    return t*t*t*(t*(t*6.0-15.0)+10.0);
+}
+
+float cnoise(vec2 P)
+{
+    vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+    vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+    Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+    vec4 ix = Pi.xzxz;
+    vec4 iy = Pi.yyww;
+    vec4 fx = Pf.xzxz;
+    vec4 fy = Pf.yyww;
+    vec4 i = permute(permute(ix) + iy);
+    vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+    vec4 gy = abs(gx) - 0.5;
+    vec4 tx = floor(gx + 0.5);
+    gx = gx - tx;
+    vec2 g00 = vec2(gx.x,gy.x);
+    vec2 g10 = vec2(gx.y,gy.y);
+    vec2 g01 = vec2(gx.z,gy.z);
+    vec2 g11 = vec2(gx.w,gy.w);
+    vec4 norm = 1.79284291400159 - 0.85373472095314 * vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+    g00 *= norm.x;
+    g01 *= norm.y;
+    g10 *= norm.z;
+    g11 *= norm.w;
+    float n00 = dot(g00, vec2(fx.x, fy.x));
+    float n10 = dot(g10, vec2(fx.y, fy.y));
+    float n01 = dot(g01, vec2(fx.z, fy.z));
+    float n11 = dot(g11, vec2(fx.w, fy.w));
+    vec2 fade_xy = fade(Pf.xy);
+    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+    return 2.3 * n_xy;
+}`
+
+function createFragmentsArray() {
+  return {
+    pattern1: `
+        void main() {
+          gl_FragColor = vec4(vUv, 1.0, 1.0);
+        }
+      `,
+    pattern2: `
+        void main() {
+          gl_FragColor = vec4(vUv, 0.0, 1.0);
+        }
+      `,
+    pattern3: `
+        void main() {
+          float strength = vUv.x;
+
+          gl_FragColor = vec4(vec3(strength), 1.0);
+        }
+      `,
+    pattern4: `
+        void main() {
+          float strength = vUv.y;
+
+          gl_FragColor = vec4(vec3(strength), 1.0);
+        }
+      `,
+    pattern5: `
+        void main() {
+          float strength = 1.0 - vUv.y;
+
+          gl_FragColor = vec4(vec3(strength), 1.0);
+        }
+      `,
+    pattern6: `
+        void main() {
+          float strength = vUv.y * 10.0;
+
+          gl_FragColor = vec4(vec3(strength), 1.0);
+        }
+      `,
+    pattern7: `
+      void main() {
+        float strength = mod(vUv.y * 10.0, 1.0);
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern8: `
+      void main() {
+        float strength = mod(vUv.y * 10.0, 1.0);
+        strength = step(0.5, strength);
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern9: `
+      void main() {
+        float strength = mod(vUv.y * 10.0, 1.0);
+        strength = step(0.8, strength);
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern10: `
+      void main() {
+        float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern11: `
+      void main() {
+        float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
+        strength += step(0.8, mod(vUv.y * 10.0, 1.0));
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern12: `
+      void main() {
+        float strength = step(0.8, mod(vUv.x * 10.0, 1.0));
+        strength *= step(0.8, mod(vUv.y * 10.0, 1.0));
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern13: `
+      void main() {
+        float strength = step(0.8, mod(vUv.y * 10.0, 1.0));
+        strength -= step(0.6, mod(vUv.x * 10.0, 1.0));
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern14: `
+      void main() {
+        float barX = step(0.4, mod(vUv.x * 10.0, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
+        float barY = step(0.8, mod(vUv.x * 10.0, 1.0)) * step(0.4, mod(vUv.y * 10.0, 1.0));
+        float strength = barX + barY;
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern15: `
+      void main() {
+        float barX = step(0.4, mod(vUv.x * 10.0 - 0.2, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
+        float barY = step(0.8, mod(vUv.x * 10.0 , 1.0)) * step(0.4, mod(vUv.y * 10.0 -0.2, 1.0));
+        float strength = barX + barY;
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+    pattern15: `
+      void main() {
+        float barX = step(0.4, mod(vUv.x * 10.0 - 0.2, 1.0)) * step(0.8, mod(vUv.y * 10.0, 1.0));
+        float barY = step(0.8, mod(vUv.x * 10.0 , 1.0)) * step(0.4, mod(vUv.y * 10.0 -0.2, 1.0));
+        float strength = barX + barY;
+
+        gl_FragColor = vec4(vec3(strength), 1.0);
+      }
+    `,
+  }
+}
+
+const shaderFragmentMainFunctionPatterns = createFragmentsArray()
+
+const shaderGeometry = new PlaneGeometry(2, 2, 32, 32)
+
+let stepY = 0
+
+const group = new Group()
+
+for (let key in shaderFragmentMainFunctionPatterns) {
+  const shaderMaterial = new ShaderMaterial({
+    vertexShader: vertexFromPattern,
+    fragmentShader: `
+        ${shaderFragmentGeneralCode}
+        ${shaderFragmentMainFunctionPatterns[key]}
+      `,
+  })
+
+  const shaderMesh = new Mesh(shaderGeometry, shaderMaterial)
+
+  shaderMesh.position.y = stepY
+
+  stepY -= 2.5
+
+  group.add(shaderMesh)
+}
+scene.add(group)
+
+/**
+ * Lights
+ */
+
+const directionalLight = new DirectionalLight(0xffffff, 1)
+directionalLight.position.set(0, 2, 2)
+scene.add(directionalLight)
+
+/**
+ * Camera
+ */
+// Base camera
+const camera = new PerspectiveCamera(
+  35,
+  sizes.width / sizes.height,
+  0.1,
+  100
+)
+camera.position.z = 4
+camera.position.y = 0
+scene.add(camera)
+
+// Controls
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
+controls.enableZoom = false
+
+/**
+ * Renderer
+ */
+const renderer = new WebGLRenderer({
+  canvas: canvas,
+})
+renderer.setSize(sizes.width, sizes.height)
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.physicallyCorrectLights = true
+
+/**
+ * Animate
+ */
+const clock = new Clock()
+let previousTime = 0
+let fontInitialized = false
+let textGeometry = null
+
+const tick = () => {
+  const elapsedTime = clock.getElapsedTime()
+  const deltaTime = elapsedTime - previousTime
+  previousTime = elapsedTime
+
+  // if (fontLoaded && !fontInitialized) {
+  //   textGeometry = new TextGeometry('1', {
+  //     font: fontLoaded,
+  //     size: 0.3,
+  //     height: 0.1,
+  //     curveSegments: 10,
+  //     bevelEnabled: true,
+  //     bevelThickness: 0.03,
+  //     bevelSize: 0.02,
+  //     bevelOffset: 0,
+  //     bevelSegments: 3,
+  //   })
+  //   const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+  //   const text = new THREE.Mesh(textGeometry, textMaterial)
+  //   text.position.set(0.85, 0.75, 0)
+
+  //   fontInitialized = true
+  //   scene.add(text)
+  // } else if (textureLoader && fontInitialized) {
+  //   textGeometry.text = 2
+  // }
+
+  group.position.y = -1 * currentScroll
+
+  // Update controls
+  controls.update()
+
+  // Render
+  renderer.render(scene, camera)
+
+  // Appear/disapear codeblock on the page
+  if (codeblock.shouldBeVisible != codeblock.isVisible) {
+    toogleCodeblock()
+  }
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick)
+}
+
+tick()
+
+/*
+ * Helpers
+ */
+
+const resizeButton = document.getElementById('resize-btn')
+const codeblockElement = document.getElementById('codeblock')
+const codeblockScreenPosition = codeblockElement.getBoundingClientRect()
+
+function normalize(val, min, max) {
+  // Shift to positive to avoid issues when crossing the 0 line
+  if (min < 0) {
+    max += 0 - min
+    val += 0 - min
+    min = 0
+  }
+  // Shift values from 0 - max
+  val = val - min
+  max = max - min
+  return Math.max(0, Math.min(1, val / max))
+}
+
+function updateSizes(width = window.innerWidth, height = window.innerHeight) {
+  // Update sizes
+  sizes.width = width
+  sizes.height = height
+
+  // Update camera
+  camera.aspect = sizes.width / sizes.height
+  camera.updateProjectionMatrix()
+
+  // Update renderer
+  renderer.setSize(sizes.width, sizes.height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+}
+
+function toogleCodeblock() {
+  codeblock.isVisible = !codeblock.isVisible
+
+  if (codeblock.isVisible) {
+    codeblockElement.style.marginLeft = '50%'
+    updateSizes(window.innerWidth / 2, window.innerHeight)
+    stickGuiLeft()
+  } else {
+    codeblockElement.style.marginLeft = '100%'
+    codeblockElement.style.width = '50vw'
+    updateSizes()
+    stickGuiRight()
+  }
+}
+
+function stickGuiLeft() {
+  document.getElementsByClassName('dg main a')[0].style.marginLeft = '0'
+  document.getElementsByClassName('dg main a')[0].style.marginRight = '100%'
+  document.getElementsByClassName('dg main a')[0].style.transform =
+    'translateX(0%)'
+}
+;``
+function stickGuiRight() {
+  document.getElementsByClassName('dg main a')[0].style.marginLeft = '100%'
+  document.getElementsByClassName('dg main a')[0].style.marginRight = '0%'
+  document.getElementsByClassName('dg main a')[0].style.transform =
+    'translateX(-100%)'
+}
+
+function handleMouseMove(e) {
+  const availableZone = e.clientX < window.innerWidth - 35
+  const { shouldBeVisible, mouseDownResize, isVisible } = codeblock
+
+  if (!availableZone && shouldBeVisible && mouseDownResize) {
+    codeblock.shouldBeVisible = !shouldBeVisible
+    codeblock.mouseDownResize = false
+  }
+
+  if (isVisible && availableZone && shouldBeVisible && mouseDownResize) {
+    codeblockElement.style.marginLeft = e.clientX + 'px'
+
+    if (e.clientX < codeblockScreenPosition.x) {
+      codeblockElement.style.width = window.innerWidth - e.clientX + 'px'
+    }
+
+    updateSizes(e.clientX, window.innerHeight)
+  }
+}
+
+document.body.addEventListener('mousewheel', function (e) {
+  currentScroll += e.wheelDeltaY * 0.0002
+})
+
+resizeButton.addEventListener('mousedown', function () {
+  codeblock.mouseDownResize = true
+  document.addEventListener('mousemove', handleMouseMove)
+  canvas.style.transition = 'none'
+  codeblockElement.style.transition = 'none'
+})
+
+resizeButton.addEventListener('mouseup', function () {
+  codeblock.mouseDownResize = false
+  canvas.style.transition = 'width 0.5s ease-in-out'
+  codeblockElement.style.transition = 'margin 0.5s ease-in-out;'
+})
+
+document.addEventListener('keypress', (e) => {
+  const { shouldBeVisible } = codeblock
+
+  if (e.code === 'KeyG') {
+    codeblock.shouldBeVisible = !shouldBeVisible
+    console.log('Toggle code block')
+  }
+})
+
+let isFullScreen = false
+
+canvas.addEventListener('dblclick', (e) => {
+  if (!isFullScreen) {
+    canvas.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
+  isFullScreen = !isFullScreen
+})
 
 const code = document.getElementsByClassName('code')[0]
 
-code.innerHTML = init.toString()
+code.innerHTML = createFragmentsArray.toString()
 
 })();
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.920bb46b2cd32141.js.map
+//# sourceMappingURL=bundle.fb98e3d3794f3ed8.js.map
