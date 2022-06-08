@@ -15,9 +15,9 @@ const init = () => {
   const debugOptions = {
     bottomColor: '#186691',
     highColor: '#9bd8ff',
-    colorOffset: 0.25,
-    colorMultiplier: 2.0,
-    bigWavesSpeed: 1,
+    colorOffset: 0.08,
+    colorMultiplier: 5.0,
+    bigWavesSpeed: 0.75,
   }
 
   /**
@@ -35,7 +35,7 @@ const init = () => {
    * Object
    */
 
-  const shaderGeometry = new THREE.PlaneBufferGeometry(2, 2, 128, 128)
+  const shaderGeometry = new THREE.PlaneBufferGeometry(2, 2, 512, 512)
 
   const shaderMaterial = new THREE.ShaderMaterial({
     vertexShader,
@@ -47,6 +47,10 @@ const init = () => {
       uBigWavesElevation: { value: 0.2 },
       uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) },
       uBigWavesSpeed: { value: debugOptions.bigWavesSpeed },
+      uSmallWavesElevation: { value: 0.15 },
+      uSmallWavesFrequency: { value: 3.0 },
+      uSmallWavesSpeed: { value: 0.2 },
+      uSmallIterations: { value: 4 },
 
       uColorBottom: { value: new THREE.Color(debugOptions.bottomColor) },
       uColorHigh: { value: new THREE.Color(debugOptions.highColor) },
@@ -101,6 +105,30 @@ const init = () => {
     .max(10)
     .step(0.001)
     .name('uBigWavesSpeed')
+  gui
+    .add(shaderMaterial.uniforms.uSmallWavesElevation, 'value')
+    .min(0)
+    .max(1)
+    .step(0.001)
+    .name('uSmallWavesElevation')
+  gui
+    .add(shaderMaterial.uniforms.uSmallWavesFrequency, 'value')
+    .min(0)
+    .max(30)
+    .step(0.001)
+    .name('uSmallWavesFrequency')
+  gui
+    .add(shaderMaterial.uniforms.uSmallWavesSpeed, 'value')
+    .min(0)
+    .max(4)
+    .step(0.001)
+    .name('uSmallWavesSpeed')
+  gui
+    .add(shaderMaterial.uniforms.uSmallIterations, 'value')
+    .min(0)
+    .max(5)
+    .step(1)
+    .name('uSmallIterations')
   gui.addColor(debugOptions, 'bottomColor').onChange(() => {
     shaderMaterial.uniforms.uColorBottom.value.set(debugOptions.bottomColor)
   })
