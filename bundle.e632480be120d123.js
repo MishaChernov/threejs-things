@@ -2,17 +2,17 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 319:
+/***/ 72:
 /***/ ((module) => {
 
-module.exports = "precision mediump float;\n\nuniform vec3 uColor;\nuniform sampler2D uTexture;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main() {\n  vec4 textureColor = texture2D(uTexture, vUv);\n  textureColor.rgb *= vElevation * 2.0 + 0.5;\n  gl_FragColor = textureColor;\n}";
+module.exports = "uniform vec3 uColorBottom;\nuniform vec3 uColorHigh;\nuniform float uColorOffset;\nuniform float uColorMultiplier;\n\nvarying float vElevation;\n\nvoid main() {\n  float mixStrength = (vElevation + uColorOffset) * uColorMultiplier;\n  vec3 bottomColor = uColorBottom;\n  vec3 mixedColor = mix(bottomColor, uColorHigh, mixStrength);\n  gl_FragColor = vec4(mixedColor, 1.0);\n}";
 
 /***/ }),
 
-/***/ 377:
+/***/ 320:
 /***/ ((module) => {
 
-module.exports = "uniform mat4 projectionMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 modelMatrix;\nuniform vec2 uFrequency;\nuniform float uTime;\n\nattribute vec2 uv;\nattribute vec3 position;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\nvoid main() {\n    vec4 modelPosition = modelMatrix * vec4(position, 1.0);\n    modelPosition.z += sin(modelPosition.x * uFrequency.x - uTime) * 0.01;\n    modelPosition.z += sin(modelPosition.y * uFrequency.y - uTime) * 0.02;\n    float elevation = sin(modelPosition.x * uFrequency.x - uTime) * 0.06;\n\n    modelPosition.z += elevation;\n\n    vec4 viewPosition = viewMatrix * modelPosition;\n    vec4 projectedPosition = projectionMatrix * viewPosition;\n\n\n\n    gl_Position = projectedPosition;\n\n    vUv = uv;\n    vElevation = elevation;\n}";
+module.exports = "uniform float uTime;\nuniform vec2 uFrequency;\nuniform vec2 uBigWavesFrequency;\nuniform float uBigWavesElevation;\nuniform float uBigWavesSpeed;\n\nvarying vec2 vUv;\nvarying float vElevation;\n\n\nvoid main() {\n    vec4 modelPosition = modelMatrix * vec4(position, 1.0);\n    // modelPosition.z += sin(modelPosition.x * uFrequency.x - uTime) * 0.001;\n    float elevation = sin(modelPosition.x * uBigWavesFrequency.x + uTime * uBigWavesSpeed) * uBigWavesElevation;\n    elevation *= sin(modelPosition.z * uBigWavesFrequency.y) * uBigWavesElevation;\n\n    modelPosition.y += elevation;\n\n    vec4 viewPosition = viewMatrix * modelPosition;\n    vec4 projectedPosition = projectionMatrix * viewPosition;\n\n    gl_Position = projectedPosition;\n\n    vUv = uv;\n    vElevation = elevation;\n}";
 
 /***/ })
 
@@ -53595,11 +53595,11 @@ var index = {
 /* harmony default export */ const dat_gui_module = ((/* unused pure expression or super */ null && (index)));
 //# sourceMappingURL=dat.gui.module.js.map
 
-// EXTERNAL MODULE: ./src/shaders/vertex.glsl
-var shaders_vertex = __webpack_require__(377);
-// EXTERNAL MODULE: ./src/shaders/fragment.glsl
-var shaders_fragment = __webpack_require__(319);
-;// CONCATENATED MODULE: ./src/shaders.js
+// EXTERNAL MODULE: ./src/shaders/waves/vertex.glsl
+var waves_vertex = __webpack_require__(320);
+// EXTERNAL MODULE: ./src/shaders/waves/fragment.glsl
+var waves_fragment = __webpack_require__(72);
+;// CONCATENATED MODULE: ./src/shaderWaves.js
 
 
 
@@ -53614,10 +53614,18 @@ const init = () => {
     height: window.innerHeight,
   }
 
+  const debugOptions = {
+    bottomColor: '#186691',
+    highColor: '#9bd8ff',
+    colorOffset: 0.25,
+    colorMultiplier: 2.0,
+    bigWavesSpeed: 1,
+  }
+
   /**
    * Base
    */
-  const gui = new GUI$1({ width: 350 })
+  const gui = new GUI$1({ width: 350, closed: true })
 
   // Canvas
   const canvas = document.querySelector('canvas.webgl')
@@ -53625,39 +53633,34 @@ const init = () => {
   // Scene
   const scene = new Scene()
 
-  // Loaders
-  const textureLoader = new TextureLoader()
-  const flagTexture = textureLoader.load('ukraine-flag.png')
-
   /**
    * Object
    */
 
-  const shaderGeometry = new PlaneGeometry(1, 1, 32, 32)
+  const shaderGeometry = new PlaneGeometry(2, 2, 128, 128)
 
-  const count = shaderGeometry.attributes.position.count
-  const randoms = new Float32Array(count)
-
-  for (let i = 0; i < count; i++) {
-    randoms[i] = Math.random()
-  }
-
-  shaderGeometry.setAttribute('aRandom', new BufferAttribute(randoms, 1))
-
-  const shaderMaterial = new RawShaderMaterial({
-    vertexShader: shaders_vertex,
-    fragmentShader: shaders_fragment,
+  const shaderMaterial = new ShaderMaterial({
+    vertexShader: waves_vertex,
+    fragmentShader: waves_fragment,
     uniforms: {
       uFrequency: { value: new Vector2(10, 5) },
       uTime: { value: 0 },
-      uColor: { value: new Color('orange') },
-      uTexture: { value: flagTexture },
+
+      uBigWavesElevation: { value: 0.2 },
+      uBigWavesFrequency: { value: new Vector2(4, 1.5) },
+      uBigWavesSpeed: { value: debugOptions.bigWavesSpeed },
+
+      uColorBottom: { value: new Color(debugOptions.bottomColor) },
+      uColorHigh: { value: new Color(debugOptions.highColor) },
+      uColorOffset: { value: debugOptions.colorOffset },
+      uColorMultiplier: { value: debugOptions.colorMultiplier },
     },
+    wireframe: false,
   })
   const shaderMesh = new Mesh(shaderGeometry, shaderMaterial)
+  shaderMesh.rotation.x = -Math.PI * 0.5
 
-  shaderMesh.scale.y = 2 / 3
-
+  gui.add(shaderMaterial, 'wireframe')
   gui
     .add(shaderMaterial.uniforms.uFrequency.value, 'x')
     .min(0)
@@ -53670,6 +53673,42 @@ const init = () => {
     .max(20)
     .step(0.01)
     .name('frequencyY')
+  gui
+    .add(shaderMaterial.uniforms.uColorOffset, 'value')
+    .min(0)
+    .max(1)
+    .step(0.001)
+    .name('uColorOffset')
+  gui
+    .add(shaderMaterial.uniforms.uColorMultiplier, 'value')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uColorMultiplier')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesFrequency.value, 'x')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesFrequencyX')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesFrequency.value, 'y')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesFrequencyY')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesSpeed, 'value')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesSpeed')
+  gui.addColor(debugOptions, 'bottomColor').onChange(() => {
+    shaderMaterial.uniforms.uColorBottom.value.set(debugOptions.bottomColor)
+  })
+  gui.addColor(debugOptions, 'highColor').onChange(() => {
+    shaderMaterial.uniforms.uColorHigh.value.set(debugOptions.highColor)
+  })
 
   scene.add(shaderMesh)
 
@@ -53855,4 +53894,4 @@ code.innerHTML = init.toString()
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.d430612308d41643.js.map
+//# sourceMappingURL=bundle.e632480be120d123.js.map
