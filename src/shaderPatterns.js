@@ -5,7 +5,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import * as dat from 'dat.gui'
 
-import vertexShader from './shaders/vertexFromPattern.glsl'
+import vertexShader from './shaders/patterns/vertexFromPattern.glsl'
 
 const sizes = {
   width: window.innerWidth,

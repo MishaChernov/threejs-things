@@ -3,8 +3,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
 
-import vertexShader from './shaders/basic/vertex.glsl'
-import fragmentShader from './shaders/basic/fragment.glsl'
+import vertexShader from './shaders/waves/vertex.glsl'
+import fragmentShader from './shaders/waves/fragment.glsl'
 
 const init = () => {
   const sizes = {
@@ -12,10 +12,18 @@ const init = () => {
     height: window.innerHeight,
   }
 
+  const debugOptions = {
+    bottomColor: '#186691',
+    highColor: '#9bd8ff',
+    colorOffset: 0.25,
+    colorMultiplier: 2.0,
+    bigWavesSpeed: 1,
+  }
+
   /**
    * Base
    */
-  const gui = new dat.GUI({ width: 350 })
+  const gui = new dat.GUI({ width: 350, closed: true })
 
   // Canvas
   const canvas = document.querySelector('canvas.webgl')
@@ -23,39 +31,34 @@ const init = () => {
   // Scene
   const scene = new THREE.Scene()
 
-  // Loaders
-  const textureLoader = new THREE.TextureLoader()
-  const flagTexture = textureLoader.load('ukraine-flag.png')
-
   /**
    * Object
    */
 
-  const shaderGeometry = new THREE.PlaneBufferGeometry(1, 1, 32, 32)
+  const shaderGeometry = new THREE.PlaneBufferGeometry(2, 2, 128, 128)
 
-  const count = shaderGeometry.attributes.position.count
-  const randoms = new Float32Array(count)
-
-  for (let i = 0; i < count; i++) {
-    randoms[i] = Math.random()
-  }
-
-  shaderGeometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1))
-
-  const shaderMaterial = new THREE.RawShaderMaterial({
+  const shaderMaterial = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms: {
       uFrequency: { value: new THREE.Vector2(10, 5) },
       uTime: { value: 0 },
-      uColor: { value: new THREE.Color('orange') },
-      uTexture: { value: flagTexture },
+
+      uBigWavesElevation: { value: 0.2 },
+      uBigWavesFrequency: { value: new THREE.Vector2(4, 1.5) },
+      uBigWavesSpeed: { value: debugOptions.bigWavesSpeed },
+
+      uColorBottom: { value: new THREE.Color(debugOptions.bottomColor) },
+      uColorHigh: { value: new THREE.Color(debugOptions.highColor) },
+      uColorOffset: { value: debugOptions.colorOffset },
+      uColorMultiplier: { value: debugOptions.colorMultiplier },
     },
+    wireframe: false,
   })
   const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial)
+  shaderMesh.rotation.x = -Math.PI * 0.5
 
-  shaderMesh.scale.y = 2 / 3
-
+  gui.add(shaderMaterial, 'wireframe')
   gui
     .add(shaderMaterial.uniforms.uFrequency.value, 'x')
     .min(0)
@@ -68,6 +71,42 @@ const init = () => {
     .max(20)
     .step(0.01)
     .name('frequencyY')
+  gui
+    .add(shaderMaterial.uniforms.uColorOffset, 'value')
+    .min(0)
+    .max(1)
+    .step(0.001)
+    .name('uColorOffset')
+  gui
+    .add(shaderMaterial.uniforms.uColorMultiplier, 'value')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uColorMultiplier')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesFrequency.value, 'x')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesFrequencyX')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesFrequency.value, 'y')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesFrequencyY')
+  gui
+    .add(shaderMaterial.uniforms.uBigWavesSpeed, 'value')
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .name('uBigWavesSpeed')
+  gui.addColor(debugOptions, 'bottomColor').onChange(() => {
+    shaderMaterial.uniforms.uColorBottom.value.set(debugOptions.bottomColor)
+  })
+  gui.addColor(debugOptions, 'highColor').onChange(() => {
+    shaderMaterial.uniforms.uColorHigh.value.set(debugOptions.highColor)
+  })
 
   scene.add(shaderMesh)
 
