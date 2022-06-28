@@ -39,6 +39,7 @@ let htmlPageNames = [
   'shaderWaves',
   'shaderGalaxy',
   'modifiedMaterials',
+  'postProcessing',
 ]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
@@ -67,6 +68,7 @@ module.exports = {
     shaderWaves: path.resolve(__dirname, '../src/shaderWaves.js'),
     shaderGalaxy: path.resolve(__dirname, '../src/shaderGalaxy.js'),
     modifiedMaterials: path.resolve(__dirname, '../src/modifiedMaterials.js'),
+    postProcessing: path.resolve(__dirname, '../src/postProcessing.js'),
     //... repeat until example 4
   },
   output: {
