@@ -45,14 +45,14 @@ const init = () => {
   // Loader
   const textureLoader = new THREE.TextureLoader()
   const dracoLoader = new DRACOLoader()
-  dracoLoader.setDecoderPath('draco/')
+  dracoLoader.setDecoderPath('./draco/')
   const gltfLoader = new GLTFLoader()
   gltfLoader.setDRACOLoader(dracoLoader)
 
   /**
    * Textures
    */
-  const bakedTexture = textureLoader.load('textures/portal/baked.jpg')
+  const bakedTexture = textureLoader.load('./textures/portal/baked.jpg')
   bakedTexture.flipY = false
   // bakedTexture.encoding = THREE.sRGBEncoding
   // bakedTexture.colorSpace = THREE.SRGBColorSpace
@@ -109,7 +109,7 @@ const init = () => {
    */
 
   gltfLoader.load(
-    'models/Portal/glTF/portal.glb',
+    './models/Portal/glTF/portal.glb',
     (gltf) => {
       console.log(gltf);
 
