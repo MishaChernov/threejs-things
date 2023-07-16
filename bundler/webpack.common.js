@@ -41,6 +41,7 @@ let htmlPageNames = [
   'modifiedMaterials',
   'postProcessing',
   'donut',
+  'portal',
 ]
 let multipleHtmlPlugins = htmlPageNames.map((name) => {
   return new HtmlWebpackPlugin({
@@ -71,6 +72,7 @@ module.exports = {
     modifiedMaterials: path.resolve(__dirname, '../src/modifiedMaterials.js'),
     postProcessing: path.resolve(__dirname, '../src/postProcessing.js'),
     donut: path.resolve(__dirname, '../src/donut.js'),
+    portal: path.resolve(__dirname, '../src/portal.js'),
     //... repeat until example 4
   },
   output: {

@@ -39,7 +39,7 @@ const init = () => {
   const gltfLoader = new GLTFLoader()
   gltfLoader.setDRACOLoader(dracoLoader)
 
-  const duckModel = gltfLoader.load(
+  gltfLoader.load(
     'models/Duck/glTF/Duck.gltf',
     (gltf) => {
       console.log('duck loaded successfully')
@@ -56,7 +56,7 @@ const init = () => {
     }
   )
 
-  const helmetModel = gltfLoader.load(
+  gltfLoader.load(
     'models/FlightHelmet/glTF/FlightHelmet.gltf',
     (gltf) => {
       // const childrens = [...scene.children]
@@ -69,7 +69,7 @@ const init = () => {
     }
   )
 
-  const foxModel = gltfLoader.load('models/Fox/glTF/Fox.gltf', (gltf) => {
+  gltfLoader.load('models/Fox/glTF/Fox.gltf', (gltf) => {
     console.log('fox', gltf)
     gltf.scene.scale.set(0.009, 0.009, 0.009)
     foxMixer = new THREE.AnimationMixer(gltf.scene)
@@ -83,11 +83,23 @@ const init = () => {
   gui.add(parameters, 'foxWalk')
   gui.add(parameters, 'foxRun')
 
-  const hamburgerModel = gltfLoader.load(
+  gltfLoader.load(
     'models/Hamburger/Hamburger1.gltf',
     (gltf) => {
       console.log('hamburger', gltf)
       gltf.scene.position.z = 1.5
+      gltf.scene.scale.set(0.09, 0.09, 0.09)
+
+      scene.add(gltf.scene)
+    }
+  )
+
+  gltfLoader.load(
+    'models/Hamburger/Hamburger2.glb',
+    (gltf) => {
+      console.log('hamburger', gltf)
+      gltf.scene.position.z = 1.5
+      gltf.scene.position.x = 1
       gltf.scene.scale.set(0.09, 0.09, 0.09)
 
       scene.add(gltf.scene)
